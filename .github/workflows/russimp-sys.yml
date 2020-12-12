@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install llvm clang cmake
-      run: apt install llvm clang cmake
+      run: sudo apt install llvm clang cmake
     - name: Install stable
       uses: actions-rs/toolchain@v1
       with:
