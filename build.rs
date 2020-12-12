@@ -8,6 +8,8 @@ const WRAPPER_FILE: &str = "wrapper.h";
 fn main() {
     let assimp_path = cmake::Config::new("assimp")
         .define("CMAKE_BUILD_TYPE", "Release")
+        .define("CMAKE_CXX_COMPILER", "/usr/bin/clang++")
+        .define("CMAKE_C_COMPILER", "/usr/bin/clang")
         .build();
 
     let output_path = PathBuf::from(var("OUT_DIR").expect("env variable OUT_DIR not found"));
