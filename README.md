@@ -1,2 +1,4 @@
-# russimp-sys
-Assimp raw bindings
+# russimp-sys 
+
+Assimp raw bindings for Rust.
+
