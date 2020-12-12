@@ -26,7 +26,7 @@ jobs:
       run: cargo test --lib --verbose
 
   cargo-publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     env:
       CRATESIO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
     runs-on: ubuntu-latest
