@@ -3,6 +3,7 @@ name = "russimp-sys"
 version = "0.1.0"
 authors = ["Jhonny Knaak de Vargas"]
 edition = "2018"
+license-file = "LICENSE"
 readme = "README.md"
 homepage = "https://github.com/jkvargas/russimp"
 categories = ["rendering","external-ffi-bindings","game-engines","multimedia"]
