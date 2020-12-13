@@ -27,6 +27,7 @@ jobs:
 
   cargo-publish:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
     env:
       CRATESIO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
     runs-on: ubuntu-latest
