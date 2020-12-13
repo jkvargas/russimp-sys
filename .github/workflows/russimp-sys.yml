@@ -13,7 +13,7 @@ jobs:
     - name: Checkout submodules
       run: git submodule update --init --recursive
     - name: Install libassimp libassimp-dev
-      run: sudo apt install libassimp4 libassimp-dev
+      run: sudo apt install libassimp-dev
     - name: Install stable
       uses: actions-rs/toolchain@v1
       with:
