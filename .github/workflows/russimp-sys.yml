@@ -34,8 +34,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Checkout submodules
       run: git submodule update --init --recursive
-    - name: Install llvm clang cmake
-      run: sudo apt install llvm clang cmake
+    - name: Install libassimp libassimp-dev
+      run: sudo apt install libassimp-dev
     - name: Install stable
       uses: actions-rs/toolchain@v1
       with:
