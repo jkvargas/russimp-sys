@@ -18,4 +18,3 @@ path = "src/lib.rs"
 
 [build-dependencies]
 bindgen = "0.55.1"
-cmake = "0.1.44"
