@@ -10,8 +10,8 @@ fn main() {
     // let path_bindings_buf_src = output_path.join(BINDINGS_FILE);
     // let path_bindings_file_src = path_bindings_buf_src.as_os_str().to_str().unwrap();
 
-    println!("cargo:rustc-link-search={}", "/usr/lib");
-    println!("cargo:include={}", "/usr/include");
+    println!("cargo:rustc-link-search={}", "/usr/local/lib");
+    println!("cargo:include={}", "/usr/local/include");
 
     // bindgen::Builder::default()
     //     .header(WRAPPER_FILE)
