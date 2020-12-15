@@ -7,14 +7,11 @@ $path_assimp_out = "$GITHUB_WORKSPACE\out"
 #$NEWPATH = "$OLDPATH;$INCLUDE"
 #[Environment]::SetEnvironmentVariable("PATH", "$NEWPATH", "Machine")
 
-$env:CC = "$($env:SystemDrive)\Program Files\LLVM\bin\clang.exe"
-$env:CXX = "$($env:SystemDrive)\Program Files\LLVM\bin\clang++.exe"
-
 git clone --depth 1 --branch v5.0.1 https://github.com/assimp/assimp.git ${path_assimp_repo}
 
 mkdir $path_assimp_repo_build
 cd $path_assimp_repo_build
 
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=path_assimp_out -G Ninja ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=path_assimp_out -DCMAKE_C_FLAGS=TRUE -DCMAKE_CXX_FLAGS=TRUE -DCMAKE_C_COMPILER="C:/Program Files/LLVM/bin/clang.exe" -DCMAKE_CXX_COMPILER="C:/Program Files/LLVM/bin/clang++.exe" -DCMAKE_LINKER="C:/Program Files/LLVM/bin/lld-link.exe" -G Ninja ..
 ninja
 ninja install
