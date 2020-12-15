@@ -10,7 +10,7 @@ categories = ["rendering","external-ffi-bindings","game-engines","multimedia"]
 keywords = ["assimp", "3d", "blend", "3ds", "glTF"]
 repository = "https://github.com/jkvargas/russimp-sys"
 description = "Raw Assimp bindings for rust"
-exclude = [ "*.bash" ]
+exclude = [ "*.bash", "*.ps1" ]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
