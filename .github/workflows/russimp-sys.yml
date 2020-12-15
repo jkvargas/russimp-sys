@@ -27,10 +27,10 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install chocolatey
-      run: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-    - name: Install llvm cmake git ninja
-      run: choco install llvm cmake git ninja
+#    - name: Install chocolatey
+#      run: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+#    - name: Install llvm cmake git ninja
+#      run: choco install llvm cmake git ninja
     - name: Install assimp
       run: pwsh -command ".\$GITHUB_WORKSPACE\install_assimp.ps1"
     - name: Install stable
