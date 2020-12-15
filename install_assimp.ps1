@@ -8,6 +8,6 @@ mkdir $path_assimp_repo_build
 
 cd $path_assimp_repo_build
 
-cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=C:\Program Files\LLVM\bin\clang++ -DCMAKE_C_COMPILER=C:\Program Files\LLVM\bin\clang -DCMAKE_INSTALL_PREFIX=path_assimp_out -G Ninja ..
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=C:\Program Files\LLVM\bin\clang++.exe -DCMAKE_C_COMPILER=C:\Program Files\LLVM\bin\clang.exe -DCMAKE_INSTALL_PREFIX=path_assimp_out -G Ninja ..
 ninja
 ninja install
