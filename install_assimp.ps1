@@ -1,6 +1,9 @@
 $path_assimp_repo = "$GITHUB_WORKSPACE\assimp"
 $path_assimp_repo_build = "$GITHUB_WORKSPACE\assimp\build"
 $path_assimp_out = "$GITHUB_WORKSPACE\out"
+$llvm_path = "$($env:SystemDrive)\Program Files\LLVM\bin"
+$clang = "$llvm_path/clang.exe"
+$clangcpp = "$llvm_path/clang++.exe"
 
 git clone --depth 1 --branch v5.0.1 https://github.com/assimp/assimp.git ${path_assimp_repo}
 
