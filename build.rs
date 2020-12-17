@@ -11,11 +11,15 @@ fn main() {
     // let path_bindings_file_src = path_bindings_buf_src.as_os_str().to_str().unwrap();
 
     if cfg!(windows) {
-        println!("cargo:rustc-link-search={}", assimp_path("vcpkg\\installed\\x86-windows\\lib").as_str());
-        println!("cargo:include={}", assimp_path("vcpkg\\installed\\x86-windows\\include").as_str());
+        println!("cargo:rustc-link-search={}", assimp_path("vcpkg\\installed\\x64-windows\\lib").as_str());
+        println!("cargo:include={}", assimp_path("vcpkg\\installed\\x64-windows\\include").as_str());
+
+        println!("cargo:rustc-flags=-l assimp-vc142-mt");
     } else {
         println!("cargo:rustc-link-search={}", "/usr/local/lib");
         println!("cargo:include={}", "/usr/local/include");
+
+        println!("cargo:rustc-flags=-l assimp");
     }
 
     // bindgen::Builder::default()
@@ -31,12 +35,6 @@ fn main() {
     //     .unwrap()
     //     .write_to_file(path_bindings_file_src)
     //     .unwrap();
-
-    if cfg!(windows) {
-        println!("cargo:rustc-flags=-l assimp-vc142-mt");
-    } else {
-        println!("cargo:rustc-flags=-l assimp");
-    }
 }
 
 fn assimp_path(relative_path: &str) -> String {
