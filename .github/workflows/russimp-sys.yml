@@ -25,6 +25,8 @@ jobs:
 
   win-build:
     runs-on: windows-latest
+    env:
+      VCPKG_DEFAULT_TRIPLET: x64-windows
     steps:
     - uses: actions/checkout@v2
     - name: Install assimp
