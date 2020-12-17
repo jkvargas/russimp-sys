@@ -10,8 +10,13 @@ fn main() {
     // let path_bindings_buf_src = output_path.join(BINDINGS_FILE);
     // let path_bindings_file_src = path_bindings_buf_src.as_os_str().to_str().unwrap();
 
-    println!("cargo:rustc-link-search={}", "/usr/local/lib");
-    println!("cargo:include={}", "/usr/local/include");
+    if cfg!(windows) {
+        println!("cargo:rustc-link-search={}", assimp_path("vcpkg\\installed\\x86-windows\\lib").as_str());
+        println!("cargo:include={}", assimp_path("vcpkg\\installed\\x86-windows\\include").as_str());
+    } else {
+        println!("cargo:rustc-link-search={}", "/usr/local/lib");
+        println!("cargo:include={}", "/usr/local/include");
+    }
 
     // bindgen::Builder::default()
     //     .header(WRAPPER_FILE)
@@ -27,5 +32,18 @@ fn main() {
     //     .write_to_file(path_bindings_file_src)
     //     .unwrap();
 
-    println!("cargo:rustc-flags=-l assimp");
+    if cfg!(windows) {
+        println!("cargo:rustc-flags=-l assimp-vc142-mt");
+    } else {
+        println!("cargo:rustc-flags=-l assimp");
+    }
+}
+
+fn assimp_path(relative_path: &str) -> String {
+    let mut assimp_install_path = std::env::var("GITHUB_WORKSPACE").unwrap();
+
+    assimp_install_path.push_str("\\");
+    assimp_install_path.push_str(relative_path);
+
+    assimp_install_path
 }
