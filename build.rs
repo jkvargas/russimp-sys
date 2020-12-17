@@ -32,7 +32,11 @@ fn main() {
     //     .write_to_file(path_bindings_file_src)
     //     .unwrap();
 
-    println!("cargo:rustc-flags=-l assimp");
+    if cfg!(windows) {
+        println!("cargo:rustc-flags=-l assimp-vc142-mt");
+    } else {
+        println!("cargo:rustc-flags=-l assimp");
+    }
 }
 
 fn assimp_path(relative_path: &str) -> String {
