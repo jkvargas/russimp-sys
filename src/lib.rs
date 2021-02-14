@@ -7,12 +7,26 @@ pub use crate::bindings::*;
 
 impl From<aiString> for String {
     fn from(string: aiString) -> Self {
-        unsafe{ std::str::from_utf8(std::slice::from_raw_parts(string.data.as_ptr() as *const u8, string.length as _)) }.unwrap().into()
+        unsafe {
+            std::str::from_utf8(std::slice::from_raw_parts(
+                string.data.as_ptr() as *const u8,
+                string.length as _,
+            ))
+        }
+        .unwrap()
+        .into()
     }
 }
 
 impl From<&aiString> for String {
     fn from(string: &aiString) -> Self {
-        unsafe{ std::str::from_utf8(std::slice::from_raw_parts(string.data.as_ptr() as *const u8, string.length as _)) }.unwrap().into()
+        unsafe {
+            std::str::from_utf8(std::slice::from_raw_parts(
+                string.data.as_ptr() as *const u8,
+                string.length as _,
+            ))
+        }
+        .unwrap()
+        .into()
     }
 }
