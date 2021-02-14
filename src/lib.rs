@@ -5,18 +5,14 @@
 mod bindings;
 pub use crate::bindings::*;
 
-use std::ffi::CStr;
-
-impl Into<String> for aiString {
-    fn into(self) -> String {
-        let content = unsafe { CStr::from_ptr(self.data.as_ptr()) };
-        content.to_str().unwrap().to_string()
+impl From<aiString> for String {
+    fn from(string: aiString) -> Self {
+        unsafe{ std::str::from_utf8(std::slice::from_raw_parts(string.data.as_ptr() as *const u8, string.length as _)) }.unwrap().into()
     }
 }
 
-impl Into<String> for &aiString {
-    fn into(self) -> String {
-        let content = unsafe { CStr::from_ptr( self.data.as_ptr() )};
-        content.to_str().unwrap().to_string()
+impl From<&aiString> for String {
+    fn from(string: &aiString) -> Self {
+        unsafe{ std::str::from_utf8(std::slice::from_raw_parts(string.data.as_ptr() as *const u8, string.length as _)) }.unwrap().into()
     }
 }
