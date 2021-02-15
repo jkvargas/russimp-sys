@@ -4,8 +4,14 @@ use std::env::var;
 
 fn main() {
     if cfg!(windows) {
-        println!("cargo:rustc-link-search={}", assimp_path("vcpkg\\installed\\x64-windows\\lib").as_str());
-        println!("cargo:include={}", assimp_path("vcpkg\\installed\\x64-windows\\include").as_str());
+        println!(
+            "cargo:rustc-link-search={}",
+            assimp_path("vcpkg\\installed\\x64-windows\\lib").as_str()
+        );
+        println!(
+            "cargo:include={}",
+            assimp_path("vcpkg\\installed\\x64-windows\\include").as_str()
+        );
         println!("cargo:rustc-link-lib=static=assimp-vc142-mt");
     } else {
         println!("cargo:rustc-link-search={}", "/usr/local/lib");
