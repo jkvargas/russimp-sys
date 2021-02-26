@@ -6,22 +6,22 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lin-build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install assimp
-      run: sudo bash ${GITHUB_WORKSPACE}/install_assimp.bash
-    - name: Install stable
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --lib --verbose
+#  lin-build:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Install assimp
+#      run: sudo bash ${GITHUB_WORKSPACE}/install_assimp.bash
+#    - name: Install stable
+#      uses: actions-rs/toolchain@v1
+#      with:
+#        profile: minimal
+#        toolchain: stable
+#        override: true
+#    - name: Build
+#      run: cargo build --verbose
+#    - name: Run tests
+#      run: cargo test --lib --verbose
 
   win-build:
     runs-on: windows-latest
@@ -42,22 +42,22 @@ jobs:
     - name: Run tests
       run: cargo test --lib --verbose
 
-  cargo-publish:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [ lin-build, win-build ]
-    env:
-      CRATESIO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install assimp
-      run: sudo bash ${GITHUB_WORKSPACE}/install_assimp.bash
-    - name: Install stable
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-    - name: cargo publish
-      continue-on-error: true
-      run: cargo publish --token ${CRATESIO_TOKEN}
+#  cargo-publish:
+#    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+#    needs: [ lin-build, win-build ]
+#    env:
+#      CRATESIO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Install assimp
+#      run: sudo bash ${GITHUB_WORKSPACE}/install_assimp.bash
+#    - name: Install stable
+#      uses: actions-rs/toolchain@v1
+#      with:
+#        profile: minimal
+#        toolchain: stable
+#        override: true
+#    - name: cargo publish
+#      continue-on-error: true
+#      run: cargo publish --token ${CRATESIO_TOKEN}

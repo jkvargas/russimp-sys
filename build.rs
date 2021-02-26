@@ -6,7 +6,7 @@ const BINDINGS_FILE: &str = "bindings.rs";
 const WRAPPER_FILE: &str = "wrapper.h";
 
 fn main() {
-    bindgen::Builder::default()
+    let builder = bindgen::Builder::default()
         .header(WRAPPER_FILE)
         .whitelist_type("aiPostProcessSteps")
         .whitelist_type("aiPrimitiveType")
@@ -14,8 +14,13 @@ fn main() {
         .whitelist_function("aiImportFile")
         .whitelist_function("aiImportFileFromMemory")
         .whitelist_function("aiReleaseImport")
-        .whitelist_function("aiGetErrorString")
-        .generate()
+        .whitelist_function("aiGetErrorString");
+
+    if cfg!(windows) {
+        builder.clang_args(&["-I", assimp_path("vcpkg\\installed\\x64-windows\\include").as_str()])
+    }
+
+    builder.generate()
         .unwrap()
         .write_to_file(get_output_path(BINDINGS_FILE))
         .unwrap();
