@@ -1,6 +1,6 @@
 #![allow(unused_imports, dead_code, unused_variables)]
 
-use std::env::var;
+use std::{env::var, path::PathBuf};
 
 const BINDINGS_FILE: &str = "bindings.rs";
 const WRAPPER_FILE: &str = "wrapper.h";
