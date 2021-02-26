@@ -1,9 +1,9 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
+#![allow(improper_ctypes)]
 
-mod bindings;
-pub use crate::bindings::*;
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 impl From<aiString> for String {
     fn from(string: aiString) -> Self {
@@ -13,8 +13,8 @@ impl From<aiString> for String {
                 string.length as _,
             ))
         }
-        .unwrap()
-        .into()
+            .unwrap()
+            .into()
     }
 }
 
@@ -26,7 +26,7 @@ impl From<&aiString> for String {
                 string.length as _,
             ))
         }
-        .unwrap()
-        .into()
+            .unwrap()
+            .into()
     }
 }

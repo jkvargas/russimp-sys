@@ -23,28 +23,29 @@ jobs:
     - name: Run tests
       run: cargo test --lib --verbose
 
-  win-build:
-    runs-on: windows-latest
-    env:
-      VCPKG_DEFAULT_TRIPLET: x64-windows
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install assimp
-      run: pwsh -command ".\$GITHUB_WORKSPACE\install_assimp.ps1"
-    - name: Install stable
-      uses: actions-rs/toolchain@v1
-      with:
-        profile: minimal
-        toolchain: stable
-        override: true
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --lib --verbose
+# win build disabled for now
+#  win-build:
+#    runs-on: windows-latest
+#    env:
+#      VCPKG_DEFAULT_TRIPLET: x64-windows
+#    steps:
+#    - uses: actions/checkout@v2
+#    - name: Install assimp
+#      run: pwsh -command ".\$GITHUB_WORKSPACE\install_assimp.ps1"
+#    - name: Install stable
+#      uses: actions-rs/toolchain@v1
+#      with:
+#        profile: minimal
+#        toolchain: stable
+#        override: true
+#    - name: Build
+#      run: cargo build --verbose
+#    - name: Run tests
+#      run: cargo test --lib --verbose
 
   cargo-publish:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [ lin-build, win-build ]
+    needs: [ lin-build ]
     env:
       CRATESIO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
     runs-on: ubuntu-latest
