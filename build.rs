@@ -17,15 +17,13 @@ fn main() {
         .whitelist_function("aiGetErrorString");
 
     if cfg!(windows) {
-        builder.clang_args(&["-I", assimp_path("vcpkg\\installed\\x64-windows\\include").as_str()]);
-    }
+        builder
+            .clang_args(&["-I", assimp_path("vcpkg\\installed\\x64-windows\\include").as_str()])
+            .generate()
+            .unwrap()
+            .write_to_file(get_output_path(BINDINGS_FILE))
+            .unwrap();
 
-    builder.generate()
-        .unwrap()
-        .write_to_file(get_output_path(BINDINGS_FILE))
-        .unwrap();
-
-    if cfg!(windows) {
         println!(
             "cargo:rustc-link-search={}",
             assimp_path("vcpkg\\installed\\x64-windows\\lib").as_str()
@@ -36,6 +34,12 @@ fn main() {
         );
         println!("cargo:rustc-link-lib=static=assimp-vc142-mt");
     } else {
+        builder
+            .generate()
+            .unwrap()
+            .write_to_file(get_output_path(BINDINGS_FILE))
+            .unwrap();
+
         println!("cargo:rustc-link-search={}", "/usr/local/lib");
         println!("cargo:include={}", "/usr/local/include");
         println!("cargo:rustc-flags=-l assimp");
