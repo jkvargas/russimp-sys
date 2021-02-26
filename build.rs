@@ -6,7 +6,7 @@ const BINDINGS_FILE: &str = "bindings.rs";
 const WRAPPER_FILE: &str = "wrapper.h";
 
 fn main() {
-    let builder = bindgen::Builder::default()
+    bindgen::Builder::default()
         .header(WRAPPER_FILE)
         .whitelist_type("aiPostProcessSteps")
         .whitelist_type("aiPrimitiveType")
@@ -14,36 +14,15 @@ fn main() {
         .whitelist_function("aiImportFile")
         .whitelist_function("aiImportFileFromMemory")
         .whitelist_function("aiReleaseImport")
-        .whitelist_function("aiGetErrorString");
+        .whitelist_function("aiGetErrorString")
+        .generate()
+        .unwrap()
+        .write_to_file(get_output_path(BINDINGS_FILE))
+        .unwrap();
 
-    if cfg!(windows) {
-        builder
-            .clang_args(&["-I", assimp_path("vcpkg\\installed\\x64-windows\\include").as_str()])
-            .generate()
-            .unwrap()
-            .write_to_file(get_output_path(BINDINGS_FILE))
-            .unwrap();
-
-        println!(
-            "cargo:rustc-link-search={}",
-            assimp_path("vcpkg\\installed\\x64-windows\\lib").as_str()
-        );
-        println!(
-            "cargo:include={}",
-            assimp_path("vcpkg\\installed\\x64-windows\\include").as_str()
-        );
-        println!("cargo:rustc-link-lib=static=assimp-vc142-mt");
-    } else {
-        builder
-            .generate()
-            .unwrap()
-            .write_to_file(get_output_path(BINDINGS_FILE))
-            .unwrap();
-
-        println!("cargo:rustc-link-search={}", "/usr/local/lib");
-        println!("cargo:include={}", "/usr/local/include");
-        println!("cargo:rustc-flags=-l assimp");
-    }
+    println!("cargo:rustc-link-search={}", "/usr/local/lib");
+    println!("cargo:include={}", "/usr/local/include");
+    println!("cargo:rustc-flags=-l assimp");
 }
 
 fn get_output_path<'a>(content: &str) -> String {
