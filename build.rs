@@ -17,7 +17,7 @@ fn main() {
         .whitelist_function("aiGetErrorString");
 
     if cfg!(windows) {
-        builder.clang_args(&["-I", assimp_path("vcpkg\\installed\\x64-windows\\include").as_str()])
+        builder.clang_args(&["-I", assimp_path("vcpkg\\installed\\x64-windows\\include").as_str()]);
     }
 
     builder.generate()
