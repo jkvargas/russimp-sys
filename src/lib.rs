@@ -3,8 +3,7 @@
 #![allow(non_snake_case)]
 #![allow(improper_ctypes)]
 
-mod bindings;
-pub use crate::bindings::*;
+include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 impl From<aiString> for String {
     fn from(string: aiString) -> Self {
