@@ -19,3 +19,11 @@ path = "src/lib.rs"
 
 [build-dependencies]
 bindgen = "0.57.0"
+
+[package.metadata.vcpkg]
+git = "https://github.com/microsoft/vcpkg"
+rev = "9ab3baf"
+
+[package.metadata.vcpkg.target]
+x86_64-pc-windows-msvc = { triplet = "x64-windows-static-md", install = ["assimp"] }
+x86-pc-windows-msvc = { triplet = "x86-windows-static-md", install = ["assimp"] }
