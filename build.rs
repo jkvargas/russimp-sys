@@ -19,6 +19,7 @@ fn main() {
         .whitelist_function("aiImportFileFromMemory")
         .whitelist_function("aiReleaseImport")
         .whitelist_function("aiGetErrorString")
+        .generate_comments(false)
         .generate()
         .unwrap()
         .write_to_file(get_output_path(BINDINGS_FILE))
