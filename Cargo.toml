@@ -19,6 +19,7 @@ path = "src/lib.rs"
 
 [build-dependencies]
 bindgen = "0.57.0"
+vcpkg = "0.2"
 
 [package.metadata.vcpkg]
 git = "https://github.com/microsoft/vcpkg"
