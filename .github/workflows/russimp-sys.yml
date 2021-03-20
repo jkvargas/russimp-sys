@@ -25,9 +25,11 @@ jobs:
 
   win-build:
     runs-on: windows-latest
-    env:
-      LIBCLANG_PATH: C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\Llvm\x64\bin
     steps:
+    - name: Set up Visual Studio shell
+      uses: egor-tensin/vs-shell@v2-
+    - name: Set up LIBCLANG_PATH
+      run:  echo "LIBCLANG_PATH=$env:VCINSTALLDIR\Tools\Llvm\x64\bin" >> $env:GITHUB_ENV
     - uses: actions/checkout@v2
     - name: Install stable
       uses: actions-rs/toolchain@v1
