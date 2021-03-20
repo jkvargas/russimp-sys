@@ -51,7 +51,6 @@ jobs:
     needs: [ lin-build, win-build ]
     env:
       CRATESIO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
-      TAG_NAME: $(awk -F\" '/^version = / { print $2; exit }' ${GITHUB_WORKSPACE}/Cargo.toml)
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -63,10 +62,6 @@ jobs:
         profile: minimal
         toolchain: stable
         override: true
-    - name: Creating tag
-      run: git tag ${TAG_NAME}
-    - name: Pushing tag
-      run: git push origin ${TAG_NAME}
     - name: cargo publish
       continue-on-error: true
       run: cargo publish --token ${CRATESIO_TOKEN}
