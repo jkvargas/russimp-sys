@@ -55,8 +55,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Install git
-      run: sudo apt install git
     - name: Install assimp
       run: sudo bash ${GITHUB_WORKSPACE}/install_assimp.bash
     - name: Install stable
@@ -66,9 +64,9 @@ jobs:
         toolchain: stable
         override: true
     - name: Creating tag
-      run: bash git tag ${TAG_NAME}
+      run: git tag ${TAG_NAME}
     - name: Pushing tag
-      run: bash git push origin ${TAG_NAME}
+      run: git push origin ${TAG_NAME}
     - name: cargo publish
       continue-on-error: true
       run: cargo publish --token ${CRATESIO_TOKEN}
