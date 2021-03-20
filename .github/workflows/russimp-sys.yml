@@ -62,6 +62,12 @@ jobs:
         profile: minimal
         toolchain: stable
         override: true
+    - name: Exporting tag version
+      run: bash export TAG_NAME=$(awk -F\" '/^version = / { print $2; exit }' Cargo.toml)
+    - name: Creating tag
+      run: bash git tag ${TAG_NAME}
+    - name: Pushing tag
+      run: bash git push origin ${TAG_NAME}
     - name: cargo publish
       continue-on-error: true
       run: cargo publish --token ${CRATESIO_TOKEN}
