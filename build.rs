@@ -9,7 +9,7 @@ const WRAPPER_FILE: &str = "wrapper.h";
 fn main() {
     let (include, libdir, libname) = assimp_lib_data();
 
-    bindgen::Builder::default()
+    let mut builder = bindgen::Builder::default()
         .clang_arg(format!("-I{}", include))
         .header(WRAPPER_FILE)
         .whitelist_type("aiPostProcessSteps")
@@ -18,8 +18,13 @@ fn main() {
         .whitelist_function("aiImportFile")
         .whitelist_function("aiImportFileFromMemory")
         .whitelist_function("aiReleaseImport")
-        .whitelist_function("aiGetErrorString")
-        .generate_comments(false)
+        .whitelist_function("aiGetErrorString");
+
+    if cfg!(target_os = "windows") {
+        builder = builder.generate_comments(false);
+    }
+
+    builder
         .generate()
         .unwrap()
         .write_to_file(get_output_path(BINDINGS_FILE))
@@ -61,7 +66,11 @@ fn assimp_lib_data() -> (String, String, String) {
 fn get_output_path<'a>(content: &str) -> String {
     let output_path = PathBuf::from(var("OUT_DIR").expect("env variable OUT_DIR not found"));
     let path_bindings_buf_src = output_path.join(content);
-    path_bindings_buf_src.as_os_str().to_str().unwrap().to_string()
+    path_bindings_buf_src
+        .as_os_str()
+        .to_str()
+        .unwrap()
+        .to_string()
 }
 
 fn assimp_path(relative_path: &str) -> String {

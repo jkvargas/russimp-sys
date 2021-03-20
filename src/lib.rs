@@ -13,8 +13,8 @@ impl From<aiString> for String {
                 string.length as _,
             ))
         }
-            .unwrap()
-            .into()
+        .unwrap()
+        .into()
     }
 }
 
@@ -26,7 +26,7 @@ impl From<&aiString> for String {
                 string.length as _,
             ))
         }
-            .unwrap()
-            .into()
+        .unwrap()
+        .into()
     }
 }
