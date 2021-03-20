@@ -27,7 +27,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Set up Visual Studio shell
-      uses: egor-tensin/vs-shell@v2-
+      uses: egor-tensin/vs-shell@v2
     - name: Set up LIBCLANG_PATH
       run:  echo "LIBCLANG_PATH=$env:VCINSTALLDIR\Tools\Llvm\x64\bin" >> $env:GITHUB_ENV
     - uses: actions/checkout@v2
