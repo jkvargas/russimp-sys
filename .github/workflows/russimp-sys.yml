@@ -55,6 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Install git
+      run: sudo apt install git
     - name: Install assimp
       run: sudo bash ${GITHUB_WORKSPACE}/install_assimp.bash
     - name: Install stable
