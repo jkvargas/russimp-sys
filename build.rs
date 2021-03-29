@@ -12,13 +12,15 @@ fn main() {
     let mut builder = bindgen::Builder::default()
         .clang_arg(format!("-I{}", include))
         .header(WRAPPER_FILE)
-        .whitelist_type("aiPostProcessSteps")
-        .whitelist_type("aiPrimitiveType")
-        .whitelist_type("aiTextureType")
-        .whitelist_function("aiImportFile")
-        .whitelist_function("aiImportFileFromMemory")
-        .whitelist_function("aiReleaseImport")
-        .whitelist_function("aiGetErrorString");
+        .parse_callbacks(Box::new(bindgen::CargoCallbacks))
+        .whitelist_type("ai.*")
+        .whitelist_function("ai.*")
+        .whitelist_var("ai.*")
+        .whitelist_var("AI_.*")
+        .derive_partialeq(true)
+        .derive_eq(true)
+        .derive_hash(true)
+        .derive_debug(true);
 
     if cfg!(target_os = "windows") {
         builder = builder.generate_comments(false);
@@ -63,7 +65,7 @@ fn assimp_lib_data() -> (String, String, String) {
     )
 }
 
-fn get_output_path<'a>(content: &str) -> String {
+fn get_output_path(content: &str) -> String {
     let output_path = PathBuf::from(var("OUT_DIR").expect("env variable OUT_DIR not found"));
     let path_bindings_buf_src = output_path.join(content);
     path_bindings_buf_src
