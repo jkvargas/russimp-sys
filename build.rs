@@ -38,8 +38,12 @@ fn main() {
 }
 
 fn assimp_lib_data() -> (String, String, String) {
+    let target = std::env::var("TARGET").unwrap();
+
+    let include_path = if target.contains("apple") { "/opt/homebrew/opt/assimp/include" } else { "/usr/local/include"};
+
     let lib = find_package("assimp").unwrap_or(Library {
-        include_paths: vec![PathBuf::from("/usr/local/include")],
+        include_paths: vec![PathBuf::from(include_path)],
         link_paths: vec![PathBuf::from("/usr/local/lib")],
         found_names: vec!["assimp".to_owned()],
 
