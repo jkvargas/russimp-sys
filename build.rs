@@ -9,6 +9,14 @@ const WRAPPER_FILE: &str = "wrapper.h";
 fn main() {
     let (include, libdir, libname) = assimp_lib_data();
 
+    if cfg!(target_os = "windows") {
+        let result = std::process::Command::new("cargo")
+            .arg("vcpkg")
+            .arg("build")
+            .output()
+            .unwrap();
+    }
+
     let mut builder = bindgen::Builder::default()
         .clang_arg(format!("-I{}", include))
         .header(WRAPPER_FILE)
@@ -42,20 +50,31 @@ fn assimp_lib_data() -> (String, String, String) {
 
     let include_path = if target.contains("apple") { "/opt/homebrew/opt/assimp/include" } else { "/usr/local/include"};
 
-    let lib = find_package("assimp").unwrap_or(Library {
-        include_paths: vec![PathBuf::from(include_path)],
-        link_paths: vec![PathBuf::from("/usr/local/lib")],
-        found_names: vec!["assimp".to_owned()],
+    let mut lib = vcpkg::Config::new()
+        .vcpkg_root("target/vcpkg".into())
+        .find_package("assimp")
+        .unwrap_or(Library {
+            include_paths: vec![PathBuf::from(include_path)],
+            link_paths: vec![PathBuf::from("/usr/local/lib")],
+            found_names: vec!["assimp".to_owned()],
 
-        ports: vec![],
-        cargo_metadata: vec![],
-        dll_paths: vec![],
-        found_dlls: vec![],
+            ports: vec![],
+            cargo_metadata: vec![],
+            dll_paths: vec![],
+            found_dlls: vec![],
 
-        is_static: false,
-        found_libs: vec![],
-        vcpkg_triplet: "".to_string(),
-    });
+            is_static: false,
+            found_libs: vec![],
+            vcpkg_triplet: "".to_string(),
+        });
+
+    if cfg!(target_os = "windows") {
+        // Following dependencies are pulled in via Irrlicht.
+        // vcpkg doesn't know how to find these system dependencies, so we list them here.
+        println!("cargo:rustc-link-lib=user32");
+        println!("cargo:rustc-link-lib=gdi32");
+        lib.link_paths[0] = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap()).join(lib.link_paths[0].as_path()).into();
+    }
 
     (
         lib.include_paths[0].to_str().unwrap().to_owned(),
