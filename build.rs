@@ -57,6 +57,13 @@ fn assimp_lib_data() -> (String, String, String) {
         vcpkg_triplet: "".to_string(),
     });
 
+    if cfg!(target_os = "windows") {
+        // Following dependencies are pulled in via Irrlicht.
+        // vcpkg doesn't know how to find these system dependencies, so we list them here.
+        println!("cargo:rustc-link-lib=user32");
+        println!("cargo:rustc-link-lib=gdi32");
+    }
+
     (
         lib.include_paths[0].to_str().unwrap().to_owned(),
         lib.link_paths[0].to_str().unwrap().to_owned(),
