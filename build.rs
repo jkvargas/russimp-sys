@@ -47,12 +47,12 @@ fn main() {
 
 fn assimp_lib_data() -> (String, String, String) {
     let target = std::env::var("TARGET").unwrap();
-    let vcpkg_root = std::env::var("VCPKG_ROOT");
+    let vcpkg_root = std::env::var("VCPKG_ROOT").unwrap_or("target/vcpkg".to_string());
 
     let include_path = if target.contains("apple") { "/opt/homebrew/opt/assimp/include" } else { "/usr/local/include"};
 
     let mut lib = vcpkg::Config::new()
-        .vcpkg_root(vcpkg_root.unwrap_or("target/vcpkg".to_string()).into())
+        .vcpkg_root(vcpkg_root.into())
         .find_package("assimp")
         .unwrap_or(Library {
             include_paths: vec![PathBuf::from(include_path)],
