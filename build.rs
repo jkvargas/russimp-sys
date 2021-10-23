@@ -47,11 +47,16 @@ fn main() {
 
 fn assimp_lib_data() -> (String, String, String) {
     let target = std::env::var("TARGET").unwrap();
+    let vcpkg_root = std::env::var("VCPKG_ROOT").unwrap_or("target/vcpkg".to_string());
 
-    let include_path = if target.contains("apple") { "/opt/homebrew/opt/assimp/include" } else { "/usr/local/include"};
+    let include_path = if target.contains("apple") {
+        "/opt/homebrew/opt/assimp/include"
+    } else {
+        "/usr/local/include"
+    };
 
     let mut lib = vcpkg::Config::new()
-        .vcpkg_root("target/vcpkg".into())
+        .vcpkg_root(vcpkg_root.into())
         .find_package("assimp")
         .unwrap_or(Library {
             include_paths: vec![PathBuf::from(include_path)],
@@ -73,7 +78,9 @@ fn assimp_lib_data() -> (String, String, String) {
         // vcpkg doesn't know how to find these system dependencies, so we list them here.
         println!("cargo:rustc-link-lib=user32");
         println!("cargo:rustc-link-lib=gdi32");
-        lib.link_paths[0] = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap()).join(lib.link_paths[0].as_path()).into();
+        lib.link_paths[0] = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap())
+            .join(lib.link_paths[0].as_path())
+            .into();
     }
 
     (
