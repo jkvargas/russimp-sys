@@ -2,13 +2,13 @@
 
 Assimp raw bindings for Rust.
 
+There is a high chance that you are actually looking for russimp https://github.com/jkvargas/russimp
+
 Assimp just released v5.1.0 which is used for the linux build.
 
 Vcpkg only has assimp 5.0.1 only, it might take some time for them to update it.
 
 If you want to help maintaining this package on windows or macos, please let me know.
-
-There is a high chance that you are actually looking for russimp https://github.com/jkvargas/russimp
 
 In order to use this you will need to have assimp installed on your system.
 If you are an ubuntu user I believe you will need to install libassimp-dev.
