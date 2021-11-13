@@ -1,6 +1,6 @@
 [package]
 name = "russimp-sys"
-version = "0.2.6"
+version = "1.0.0"
 authors = ["Jhonny Knaak de Vargas"]
 edition = "2018"
 license-file = "LICENSE"
@@ -18,8 +18,8 @@ name = "russimp_sys"
 path = "src/lib.rs"
 
 [build-dependencies]
-bindgen = "0.57.0"
-vcpkg = "0.2"
+bindgen = "0.59.1"
+vcpkg = "0.2.15"
 
 [package.metadata.vcpkg]
 git = "https://github.com/microsoft/vcpkg"
