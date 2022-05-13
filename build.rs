@@ -370,6 +370,8 @@ fn assimp_dynamic_linking() -> (String, String, String) {
 
     let include_path = if target.contains("apple") {
         "/opt/homebrew/opt/assimp/include"
+    } else if std::env::var("DOCS_RS").is_ok() {
+        "assimp/include"
     } else {
         "/usr/local/include"
     };
