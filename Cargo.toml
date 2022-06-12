@@ -35,7 +35,7 @@ num_cpus = "1.13"
 
 [package.metadata.vcpkg]
 git = "https://github.com/microsoft/vcpkg"
-rev = "9ab3baf"
+rev = "8e1f46d"
 
 [package.metadata.vcpkg.target]
 x86_64-pc-windows-msvc = { triplet = "x64-windows-static-md", install = ["assimp", "zlib"] }
