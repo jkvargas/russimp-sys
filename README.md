@@ -19,5 +19,7 @@ Alternatively provide a VCPKG_ROOT environment variable pointed at the location 
 
 ## Changelog
 
+### 1.0.1
+* Builds based on 5.2.5 release
 ### 1.0.0
 * Builds based on 5.1.0 release

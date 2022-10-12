@@ -1,6 +1,6 @@
 [package]
 name = "russimp-sys"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Jhonny Knaak de Vargas"]
 edition = "2018"
 license-file = "LICENSE"
@@ -23,7 +23,7 @@ vcpkg = "0.2.15"
 
 [package.metadata.vcpkg]
 git = "https://github.com/microsoft/vcpkg"
-rev = "9ab3baf"
+rev = "7178ff9"
 
 [package.metadata.vcpkg.target]
 x86_64-pc-windows-msvc = { triplet = "x64-windows-static-md", install = ["assimp", "zlib"] }
