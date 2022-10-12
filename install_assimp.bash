@@ -15,7 +15,7 @@ if [ ! -d ${path_assimp_repo} ]; then
 fi
 
 if [ ! -d ${path_assimp_build} ]; then
-        mkdir ${path_assimp_build}
+  mkdir ${path_assimp_build}
 	# shellcheck disable=SC2164
 	cd ${path_assimp_build}
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_INSTALL_PREFIX=/usr/local -G Ninja ..
