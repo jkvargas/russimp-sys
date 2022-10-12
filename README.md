@@ -48,7 +48,7 @@ By default `russimp-sys` links to `libstdc++` in linux and `libc++` in macos, tu
 
 ## Changelog
 
-### 1.0.1
+### 1.0.3
 * Builds based on 5.2.5 release
 ### 1.0.0
 

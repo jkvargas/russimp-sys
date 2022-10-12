@@ -274,7 +274,7 @@ fn package(manifest: &BuildManifest, output: impl AsRef<Path>) {
 
 fn download_from_cache(cache_tar_name: impl AsRef<str>, version: impl AsRef<str>) -> BuildManifest {
     let download_url = format!(
-        "https://github.com/EYHN/russimp-sys/releases/download/v{}/{}",
+        "https://github.com/jkvargas/russimp-sys/releases/download/v{}/{}",
         version.as_ref(),
         cache_tar_name.as_ref()
     );
@@ -348,7 +348,7 @@ fn main() {
         let (include, libdir, libname) = assimp_dynamic_linking();
 
         if cfg!(target_os = "windows") {
-            let _ = std::process::Command::new("cargo")
+            let _ = Command::new("cargo")
                 .arg("vcpkg")
                 .arg("build")
                 .output()
