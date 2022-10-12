@@ -10,16 +10,28 @@ categories = ["rendering", "external-ffi-bindings", "game-engines", "multimedia"
 keywords = ["assimp", "3d", "blend", "3ds", "glTF"]
 repository = "https://github.com/jkvargas/russimp-sys"
 description = "Raw Assimp bindings for rust"
-exclude = ["*.bash", "*.ps1"]
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+exclude = ["/assimp", "*.bash", "*.ps1"]
 
 [lib]
 name = "russimp_sys"
 path = "src/lib.rs"
 
+[features]
+default = []
+prebuilt = ["static-link"]
+static-link = []
+nozlib = []
+nolibcxx = []
+
 [build-dependencies]
 bindgen = "0.60.1"
 vcpkg = "0.2.15"
+ureq = "2.4"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tar = "0.4"
+flate2 = "1.0"
+num_cpus = "1.13"
 
 [package.metadata.vcpkg]
 git = "https://github.com/microsoft/vcpkg"
