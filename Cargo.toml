@@ -1,6 +1,6 @@
 [package]
 name = "russimp-sys"
-version = "1.0.2"
+version = "1.0.3"
 authors = ["Jhonny Knaak de Vargas"]
 edition = "2018"
 license-file = "LICENSE"
@@ -10,7 +10,7 @@ categories = ["rendering", "external-ffi-bindings", "game-engines", "multimedia"
 keywords = ["assimp", "3d", "blend", "3ds", "glTF"]
 repository = "https://github.com/jkvargas/russimp-sys"
 description = "Raw Assimp bindings for rust"
-exclude = ["/assimp"]
+exclude = ["/assimp", "*.bash", "*.ps1"]
 
 [lib]
 name = "russimp_sys"
@@ -24,9 +24,9 @@ nozlib = []
 nolibcxx = []
 
 [build-dependencies]
-bindgen = "0.59"
+bindgen = "0.59.2"
 vcpkg = "0.2.15"
-ureq = "2.4"
+ureq = "2.5"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 tar = "0.4"
@@ -35,7 +35,7 @@ num_cpus = "1.13"
 
 [package.metadata.vcpkg]
 git = "https://github.com/microsoft/vcpkg"
-rev = "8e1f46d"
+rev = "7178ff9"
 
 [package.metadata.vcpkg.target]
 x86_64-pc-windows-msvc = { triplet = "x64-windows-static-md", install = ["assimp", "zlib"] }
