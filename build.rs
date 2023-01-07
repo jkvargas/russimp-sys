@@ -24,7 +24,7 @@ struct BuildManifest {
     pub target: String,
 }
 
-fn run_bindgen(output_file: impl AsRef<Path>, include_path: Option<&Path>) -> Result<(), ()> {
+fn run_bindgen(output_file: impl AsRef<Path>, include_path: Option<&Path>) {
     let builder = bindgen::Builder::default();
 
     builder
@@ -39,11 +39,10 @@ fn run_bindgen(output_file: impl AsRef<Path>, include_path: Option<&Path>) -> Re
         .derive_eq(true)
         .derive_hash(true)
         .derive_debug(true)
-        .generate()?
+        .generate()
+        .unwrap()
         .write_to_file(output_file.as_ref())
-        .unwrap();
-
-    Ok(())
+        .expect("Could not generate russimp bindings, for details see https://github.com/jkvargas/russimp-sys");
 }
 
 fn install(manifest: &BuildManifest) {
@@ -66,8 +65,7 @@ fn install(manifest: &BuildManifest) {
         println!("cargo:rustc-link-lib={}", "c++");
     }
 
-    run_bindgen(&PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE), None)
-        .expect("russimp generate bindgen failed, for details see https://github.com/jkvargas/russimp-sys");
+    run_bindgen(&PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE), None);
 }
 
 fn build_from_source(target: &Target) -> BuildManifest {
@@ -202,7 +200,7 @@ fn build_from_source(target: &Target) -> BuildManifest {
     }
 
     // generate bindings.rs
-    run_bindgen(&bindings_rs, Some(&assimp_include_dir)).unwrap();
+    run_bindgen(&bindings_rs, Some(&assimp_include_dir));
 
     BuildManifest {
         link_search_dir: assimp_lib_dir,
@@ -358,7 +356,7 @@ fn main() {
         run_bindgen(
             &PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE),
             Some(&PathBuf::from(include)),
-        ).expect("russimp generate bindgen failed, for details see https://github.com/jkvargas/russimp-sys");
+        );
         println!("cargo:rustc-link-search=native={}", libdir);
         println!("cargo:rustc-link-lib={}", libname);
     }
