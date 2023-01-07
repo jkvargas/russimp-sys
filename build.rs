@@ -226,12 +226,6 @@ fn package(manifest: &BuildManifest, output: impl AsRef<Path>) {
 
     tar_builder
         .append_file(
-            "bindings.rs",
-            &mut fs::File::open(&manifest.bindings_rs).unwrap(),
-        )
-        .unwrap();
-    tar_builder
-        .append_file(
             "LICENSE",
             &mut fs::File::open(&manifest.assimp_license).unwrap(),
         )
@@ -255,10 +249,11 @@ fn package(manifest: &BuildManifest, output: impl AsRef<Path>) {
         link_search_dir: PathBuf::from("lib"),
         assimp_license: PathBuf::from("LICENSE"),
         link_libs: manifest.link_libs.clone(),
-        bindings_rs: PathBuf::from("bindings.rs"),
+        bindings_rs: PathBuf::from(BINDINGS_FILE),
         target: manifest.target.clone(),
     })
     .unwrap();
+
     let manifest_json_date = manifest_json.as_bytes();
     let mut header = tar::Header::new_gnu();
     header.set_size(manifest_json_date.len() as u64);
