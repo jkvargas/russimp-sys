@@ -13,14 +13,23 @@ use serde::{Deserialize, Serialize};
 
 const BINDINGS_FILE: &str = "bindings.rs";
 const WRAPPER_FILE: &str = "wrapper.h";
+const INCLUDE_DIR: &str = "assimp/include";
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct BuildManifest {
+    pub link_search_dir: PathBuf,
+    pub assimp_license: PathBuf,
+    pub link_libs: Vec<String>,
+    pub bindings_rs: PathBuf,
+    pub target: String,
+}
 
 fn run_bindgen(output_file: impl AsRef<Path>, include_path: Option<&Path>) -> Result<(), ()> {
-    let mut builder = bindgen::Builder::default();
-    if let Some(include_path) = include_path {
-        builder = builder.clang_arg(format!("-I{}", include_path.to_str().unwrap()));
-    }
+    let builder = bindgen::Builder::default();
+
     builder
         .header(WRAPPER_FILE)
+        .clang_arg(format!("-I{}", include_path.unwrap_or_else(|| Path::new(INCLUDE_DIR)).to_str().unwrap()))
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .allowlist_type("ai.*")
         .allowlist_function("ai.*")
@@ -33,16 +42,8 @@ fn run_bindgen(output_file: impl AsRef<Path>, include_path: Option<&Path>) -> Re
         .generate()?
         .write_to_file(output_file.as_ref())
         .unwrap();
-    Ok(())
-}
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct BuildManifest {
-    pub link_search_dir: PathBuf,
-    pub assimp_license: PathBuf,
-    pub link_libs: Vec<String>,
-    pub bindings_rs: PathBuf,
-    pub target: String,
+    Ok(())
 }
 
 fn install(manifest: &BuildManifest) {
@@ -65,9 +66,8 @@ fn install(manifest: &BuildManifest) {
         println!("cargo:rustc-link-lib={}", "c++");
     }
 
-    // Write the bindings to the <OUT_DIR>/bindings.rs file.
-    let bindings_path = PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE);
-    fs::copy(&manifest.bindings_rs, bindings_path).unwrap();
+    run_bindgen(&PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE), None)
+        .expect("russimp generate bindgen failed, for details see https://github.com/jkvargas/russimp-sys");
 }
 
 fn build_from_source(target: &Target) -> BuildManifest {
@@ -252,7 +252,7 @@ fn package(manifest: &BuildManifest, output: impl AsRef<Path>) {
         bindings_rs: PathBuf::from("bindings.rs"),
         target: manifest.target.clone(),
     })
-    .unwrap();
+        .unwrap();
     let manifest_json_date = manifest_json.as_bytes();
     let mut header = tar::Header::new_gnu();
     header.set_size(manifest_json_date.len() as u64);
