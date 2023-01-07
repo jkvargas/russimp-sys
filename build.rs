@@ -65,7 +65,10 @@ fn install(manifest: &BuildManifest) {
         println!("cargo:rustc-link-lib=c++");
     }
 
-    run_bindgen(PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE), None);
+    run_bindgen(
+        PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE),
+        None,
+    );
 }
 
 fn build_from_source(target: &Target) -> BuildManifest {
@@ -77,6 +80,7 @@ fn build_from_source(target: &Target) -> BuildManifest {
         env::var("ASSIMP_SOURCE_DIR")
             .unwrap_or_else(|_| current_dir.join("assimp").to_str().unwrap().to_string()),
     );
+
     if !assimp_source_dir.exists() {
         // source dir not exist, try to clone it
         let mut git_clone = Command::new("git");
@@ -90,12 +94,12 @@ fn build_from_source(target: &Target) -> BuildManifest {
 
     println!("cargo:rerun-if-env-changed=RUSSIMP_BUILD_OUT_DIR");
     // use <RUSSIMP_BUILD_OUT_DIR> or <OUT_DIR>/build-from-source
-    let out_dir = current_dir.join(
-        env::var("RUSSIMP_BUILD_OUT_DIR").unwrap_or_else(|_| PathBuf::from(env::var("OUT_DIR").unwrap())
-                .join("build-from-source")
-                .to_string_lossy()
-                .to_string()),
-    );
+    let out_dir = current_dir.join(env::var("RUSSIMP_BUILD_OUT_DIR").unwrap_or_else(|_| {
+        PathBuf::from(env::var("OUT_DIR").unwrap())
+            .join("build-from-source")
+            .to_string_lossy()
+            .to_string()
+    }));
 
     let assimp_build_dir = out_dir.join("assimp");
     let assimp_install_dir = assimp_build_dir.join("out");
@@ -146,8 +150,14 @@ fn build_from_source(target: &Target) -> BuildManifest {
                 env::var("CMAKE_GENERATOR").unwrap_or_else(|_| "Ninja".to_string()),
             )
             .env("CC", env::var("CC").unwrap_or_else(|_| "clang".to_string()))
-            .env("CXX", env::var("CXX").unwrap_or_else(|_| "clang++".to_string()))
-            .env("ASM", env::var("ASM").unwrap_or_else(|_| "clang".to_string()))
+            .env(
+                "CXX",
+                env::var("CXX").unwrap_or_else(|_| "clang++".to_string()),
+            )
+            .env(
+                "ASM",
+                env::var("ASM").unwrap_or_else(|_| "clang".to_string()),
+            )
             .env(
                 "CXXFLAGS",
                 env::var("CXXFLAGS").unwrap_or(format!("-target {}", target)),
@@ -248,7 +258,7 @@ fn package(manifest: &BuildManifest, output: impl AsRef<Path>) {
         bindings_rs: PathBuf::from("bindings.rs"),
         target: manifest.target.clone(),
     })
-        .unwrap();
+    .unwrap();
     let manifest_json_date = manifest_json.as_bytes();
     let mut header = tar::Header::new_gnu();
     header.set_size(manifest_json_date.len() as u64);
@@ -313,12 +323,7 @@ fn main() {
             feature_suffix.push_str("-nozlib");
         }
 
-        let cache_tar_name = format!(
-            "russimp-{}-{}{}.tar.gz",
-            version,
-            target,
-            feature_suffix
-        );
+        let cache_tar_name = format!("russimp-{}-{}{}.tar.gz", version, target, feature_suffix);
 
         println!("cargo:rerun-if-env-changed=RUSSIMP_PREBUILT");
         let use_cache = env::var("RUSSIMP_PREBUILT").unwrap_or_else(|_| "ON".to_string()) != "OFF"
@@ -356,6 +361,7 @@ fn main() {
             PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE),
             Some(&PathBuf::from(include)),
         );
+
         println!("cargo:rustc-link-search=native={}", libdir);
         println!("cargo:rustc-link-lib={}", libname);
     }
@@ -404,7 +410,8 @@ fn assimp_dynamic_linking() -> (String, String, String) {
         lib.include_paths[0].to_str().unwrap().to_owned(),
         lib.link_paths[0].to_str().unwrap().to_owned(),
         lib.found_names
-            .iter().find(|n| n.starts_with("assimp"))
+            .iter()
+            .find(|n| n.starts_with("assimp"))
             .unwrap()
             .to_owned(),
     )
