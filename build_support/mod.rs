@@ -10,7 +10,7 @@ pub fn run_command(cmd: &mut Command, program: &str) {
         "current_dir: {:?}\nrunning: {:?}",
         cmd.get_current_dir()
             .map(|p| p.display().to_string())
-            .unwrap_or("".to_string()),
+            .unwrap_or_else(|| "".to_string()),
         cmd
     );
     let status = match cmd.status() {

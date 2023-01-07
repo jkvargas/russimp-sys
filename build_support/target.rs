@@ -22,13 +22,13 @@ impl Display for Target {
         if let Some(ref abi) = self.abi {
             write!(f, "-{}", abi)
         } else {
-            Result::Ok(())
+            Ok(())
         }
     }
 }
 
 impl Target {
-    pub fn target() -> Target {
+    pub fn new() -> Target {
         let target_str = env::var("TARGET").unwrap();
         Target::parse_target(target_str)
     }

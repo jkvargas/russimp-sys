@@ -48,7 +48,7 @@ fn run_bindgen(output_file: impl AsRef<Path>, include_path: Option<&Path>) {
 fn install(manifest: &BuildManifest) {
     println!(
         "cargo:rustc-link-search=native={}",
-        manifest.link_search_dir.display().to_string()
+        manifest.link_search_dir.display()
     );
 
     for lib in &manifest.link_libs {
@@ -58,14 +58,14 @@ fn install(manifest: &BuildManifest) {
     let target = Target::parse_target(&manifest.target);
 
     if target.system == "linux" && cfg!(not(feature = "nolibcxx")) {
-        println!("cargo:rustc-link-lib={}", "stdc++");
+        println!("cargo:rustc-link-lib=stdc++");
     }
 
     if target.system == "darwin" && cfg!(not(feature = "nolibcxx")) {
-        println!("cargo:rustc-link-lib={}", "c++");
+        println!("cargo:rustc-link-lib=c++");
     }
 
-    run_bindgen(&PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE), None);
+    run_bindgen(PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE), None);
 }
 
 fn build_from_source(target: &Target) -> BuildManifest {
@@ -75,9 +75,9 @@ fn build_from_source(target: &Target) -> BuildManifest {
     // use <ASSIMP_SOURCE_DIR> or <current_dir>/assimp
     let assimp_source_dir = current_dir.join(
         env::var("ASSIMP_SOURCE_DIR")
-            .unwrap_or(current_dir.join("assimp").to_str().unwrap().to_string()),
+            .unwrap_or_else(|_| current_dir.join("assimp").to_str().unwrap().to_string()),
     );
-    if assimp_source_dir.exists() == false {
+    if !assimp_source_dir.exists() {
         // source dir not exist, try to clone it
         let mut git_clone = Command::new("git");
         git_clone
@@ -91,12 +91,10 @@ fn build_from_source(target: &Target) -> BuildManifest {
     println!("cargo:rerun-if-env-changed=RUSSIMP_BUILD_OUT_DIR");
     // use <RUSSIMP_BUILD_OUT_DIR> or <OUT_DIR>/build-from-source
     let out_dir = current_dir.join(
-        env::var("RUSSIMP_BUILD_OUT_DIR").unwrap_or(
-            PathBuf::from(env::var("OUT_DIR").unwrap())
+        env::var("RUSSIMP_BUILD_OUT_DIR").unwrap_or_else(|_| PathBuf::from(env::var("OUT_DIR").unwrap())
                 .join("build-from-source")
                 .to_string_lossy()
-                .to_string(),
-        ),
+                .to_string()),
     );
 
     let assimp_build_dir = out_dir.join("assimp");
@@ -145,18 +143,18 @@ fn build_from_source(target: &Target) -> BuildManifest {
         assimp_cmake
             .env(
                 "CMAKE_GENERATOR",
-                env::var("CMAKE_GENERATOR").unwrap_or("Ninja".to_string()),
+                env::var("CMAKE_GENERATOR").unwrap_or_else(|_| "Ninja".to_string()),
             )
-            .env("CC", env::var("CC").unwrap_or("clang".to_string()))
-            .env("CXX", env::var("CXX").unwrap_or("clang++".to_string()))
-            .env("ASM", env::var("ASM").unwrap_or("clang".to_string()))
+            .env("CC", env::var("CC").unwrap_or_else(|_| "clang".to_string()))
+            .env("CXX", env::var("CXX").unwrap_or_else(|_| "clang++".to_string()))
+            .env("ASM", env::var("ASM").unwrap_or_else(|_| "clang".to_string()))
             .env(
                 "CXXFLAGS",
-                env::var("CXXFLAGS").unwrap_or(format!("-target {}", target.to_string())),
+                env::var("CXXFLAGS").unwrap_or(format!("-target {}", target)),
             )
             .env(
                 "CFLAGS",
-                env::var("CFLAGS").unwrap_or(format!("-target {}", target.to_string())),
+                env::var("CFLAGS").unwrap_or(format!("-target {}", target)),
             );
     }
 
@@ -171,7 +169,7 @@ fn build_from_source(target: &Target) -> BuildManifest {
         .args(["--config", "Release"])
         .args([
             "--parallel",
-            &env::var("NUM_JOBS").unwrap_or(num_cpus::get().to_string()),
+            &env::var("NUM_JOBS").unwrap_or_else(|_| num_cpus::get().to_string()),
         ]);
 
     build_support::run_command(&mut assimp_cmake_install, "cmake");
@@ -234,11 +232,11 @@ fn package(manifest: &BuildManifest, output: impl AsRef<Path>) {
         .unwrap();
 
     for lib_name in &manifest.link_libs {
-        let filename = static_lib_filename(&lib_name);
+        let filename = static_lib_filename(lib_name);
         tar_builder
             .append_file(
                 format!("lib/{}", filename),
-                &mut fs::File::open(&manifest.link_search_dir.join(filename)).unwrap(),
+                &mut fs::File::open(manifest.link_search_dir.join(filename)).unwrap(),
             )
             .unwrap();
     }
@@ -260,7 +258,7 @@ fn package(manifest: &BuildManifest, output: impl AsRef<Path>) {
         SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap_or_default()
-            .as_secs() as u64,
+            .as_secs(),
     );
 
     tar_builder
@@ -279,7 +277,8 @@ fn download_from_cache(cache_tar_name: impl AsRef<str>, version: impl AsRef<str>
 
     println!("Downloading {}", download_url);
     let package = build_support::download(cache_tar_name, download_url).expect("Download Failed");
-    return unpack(&package);
+
+    unpack(package)
 }
 
 fn unpack(package: impl AsRef<Path>) -> BuildManifest {
@@ -301,13 +300,13 @@ fn unpack(package: impl AsRef<Path>) -> BuildManifest {
         assimp_license: unpack_dir.join(manifest.assimp_license),
         link_libs: manifest.link_libs.clone(),
         bindings_rs: unpack_dir.join(manifest.bindings_rs),
-        target: manifest.target.clone(),
+        target: manifest.target,
     }
 }
 
 fn main() {
     if cfg!(feature = "static-link") {
-        let target = build_support::Target::target();
+        let target = Target::new();
         let version = env::var("CARGO_PKG_VERSION").unwrap();
         let mut feature_suffix = String::new();
         if cfg!(feature = "nozlib") {
@@ -317,12 +316,12 @@ fn main() {
         let cache_tar_name = format!(
             "russimp-{}-{}{}.tar.gz",
             version,
-            target.to_string(),
+            target,
             feature_suffix
         );
 
         println!("cargo:rerun-if-env-changed=RUSSIMP_PREBUILT");
-        let use_cache = env::var("RUSSIMP_PREBUILT").unwrap_or("ON".to_string()) != "OFF"
+        let use_cache = env::var("RUSSIMP_PREBUILT").unwrap_or_else(|_| "ON".to_string()) != "OFF"
             && cfg!(feature = "prebuilt");
 
         let build_manifest = if use_cache {
@@ -354,7 +353,7 @@ fn main() {
         }
 
         run_bindgen(
-            &PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE),
+            PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE),
             Some(&PathBuf::from(include)),
         );
         println!("cargo:rustc-link-search=native={}", libdir);
@@ -363,12 +362,12 @@ fn main() {
 }
 
 fn assimp_dynamic_linking() -> (String, String, String) {
-    let target = std::env::var("TARGET").unwrap();
-    let vcpkg_root = std::env::var("VCPKG_ROOT").unwrap_or("target/vcpkg".to_string());
+    let target = env::var("TARGET").unwrap();
+    let vcpkg_root = env::var("VCPKG_ROOT").unwrap_or_else(|_| "target/vcpkg".to_string());
 
     let include_path = if target.contains("apple") {
         "/opt/homebrew/opt/assimp/include"
-    } else if std::env::var("DOCS_RS").is_ok() {
+    } else if env::var("DOCS_RS").is_ok() {
         "assimp/include"
     } else {
         "/usr/local/include"
@@ -397,18 +396,15 @@ fn assimp_dynamic_linking() -> (String, String, String) {
         // vcpkg doesn't know how to find these system dependencies, so we list them here.
         println!("cargo:rustc-link-lib=user32");
         println!("cargo:rustc-link-lib=gdi32");
-        lib.link_paths[0] = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap())
-            .join(lib.link_paths[0].as_path())
-            .into();
+        lib.link_paths[0] = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
+            .join(lib.link_paths[0].as_path());
     }
 
     (
         lib.include_paths[0].to_str().unwrap().to_owned(),
         lib.link_paths[0].to_str().unwrap().to_owned(),
         lib.found_names
-            .iter()
-            .filter(|n| n.starts_with("assimp"))
-            .nth(0)
+            .iter().find(|n| n.starts_with("assimp"))
             .unwrap()
             .to_owned(),
     )
