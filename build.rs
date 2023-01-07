@@ -7,7 +7,7 @@ use std::{
     time::SystemTime,
 };
 
-use build_support::{static_lib_filename, Target};
+use build_support::{static_lib_filename};
 use flate2::{read::GzDecoder, write::GzEncoder, Compression};
 use serde::{Deserialize, Serialize};
 
@@ -48,7 +48,7 @@ fn run_bindgen(output_file: impl AsRef<Path>, include_path: Option<&Path>) {
 fn install(manifest: &BuildManifest) {
     println!(
         "cargo:rustc-link-search=native={}",
-        manifest.link_search_dir.display().to_string()
+        manifest.link_search_dir.display()
     );
 
     for lib in &manifest.link_libs {
@@ -58,14 +58,14 @@ fn install(manifest: &BuildManifest) {
     let target = Target::parse_target(&manifest.target);
 
     if target.system == "linux" && cfg!(not(feature = "nolibcxx")) {
-        println!("cargo:rustc-link-lib={}", "stdc++");
+        println!("cargo:rustc-link-lib=stdc++");
     }
 
     if target.system == "darwin" && cfg!(not(feature = "nolibcxx")) {
-        println!("cargo:rustc-link-lib={}", "c++");
+        println!("cargo:rustc-link-lib=c++");
     }
 
-    run_bindgen(&PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE), None);
+    run_bindgen(PathBuf::from(env::var("OUT_DIR").unwrap()).join(BINDINGS_FILE), None);
 }
 
 fn build_from_source(target: &Target) -> BuildManifest {
@@ -75,9 +75,9 @@ fn build_from_source(target: &Target) -> BuildManifest {
     // use <ASSIMP_SOURCE_DIR> or <current_dir>/assimp
     let assimp_source_dir = current_dir.join(
         env::var("ASSIMP_SOURCE_DIR")
-            .unwrap_or(current_dir.join("assimp").to_str().unwrap().to_string()),
+            .unwrap_or_else(|_| current_dir.join("assimp").to_str().unwrap().to_string()),
     );
-    if assimp_source_dir.exists() == false {
+    if !assimp_source_dir.exists() {
         // source dir not exist, try to clone it
         let mut git_clone = Command::new("git");
         git_clone
@@ -91,12 +91,8 @@ fn build_from_source(target: &Target) -> BuildManifest {
     println!("cargo:rerun-if-env-changed=RUSSIMP_BUILD_OUT_DIR");
     // use <RUSSIMP_BUILD_OUT_DIR> or <OUT_DIR>/build-from-source
     let out_dir = current_dir.join(
-        env::var("RUSSIMP_BUILD_OUT_DIR").unwrap_or(
-            PathBuf::from(env::var("OUT_DIR").unwrap())
-                .join("build-from-source")
-                .to_string_lossy()
-                .to_string(),
-        ),
+        env::var("RUSSIMP_BUILD_OUT_DIR").unwrap_or_else(|_| PathBuf::from(env::var("OUT_DIR").unwrap())
+                .join("build-from-source").to_str().unwrap().to_string()),
     );
 
     let assimp_build_dir = out_dir.join("assimp");
@@ -363,12 +359,12 @@ fn main() {
 }
 
 fn assimp_dynamic_linking() -> (String, String, String) {
-    let target = std::env::var("TARGET").unwrap();
-    let vcpkg_root = std::env::var("VCPKG_ROOT").unwrap_or("target/vcpkg".to_string());
+    let target = env::var("TARGET").unwrap();
+    let vcpkg_root = env::var("VCPKG_ROOT").unwrap_or("target/vcpkg".to_string());
 
     let include_path = if target.contains("apple") {
         "/opt/homebrew/opt/assimp/include"
-    } else if std::env::var("DOCS_RS").is_ok() {
+    } else if env::var("DOCS_RS").is_ok() {
         "assimp/include"
     } else {
         "/usr/local/include"
@@ -397,7 +393,7 @@ fn assimp_dynamic_linking() -> (String, String, String) {
         // vcpkg doesn't know how to find these system dependencies, so we list them here.
         println!("cargo:rustc-link-lib=user32");
         println!("cargo:rustc-link-lib=gdi32");
-        lib.link_paths[0] = PathBuf::from(std::env::var("CARGO_MANIFEST_DIR").unwrap())
+        lib.link_paths[0] = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
             .join(lib.link_paths[0].as_path())
             .into();
     }

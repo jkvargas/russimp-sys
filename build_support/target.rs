@@ -22,7 +22,7 @@ impl Display for Target {
         if let Some(ref abi) = self.abi {
             write!(f, "-{}", abi)
         } else {
-            Result::Ok(())
+            Ok(())
         }
     }
 }
