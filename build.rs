@@ -54,9 +54,9 @@ fn main() {
 
     // Build static libs?
     let build_static = if cfg!(feature = "static-link") {
-        "ON"
-    } else {
         "OFF"
+    } else {
+        "ON"
     };
 
     // CMake
