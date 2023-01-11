@@ -1,14 +1,4 @@
-mod build_support;
-
-use std::{
-    env, io,
-    path::{Path, PathBuf},
-    process::Command,
-    time::SystemTime,
-};
-
-const BINDINGS_FILE: &str = "bindings.rs";
-const WRAPPER_FILE: &str = "wrapper.h";
+use std::{env, path::PathBuf};
 
 // Compiler specific compiler flags for CMake
 fn compiler_flags() -> Vec<&'static str> {
@@ -26,12 +16,26 @@ fn compiler_flags() -> Vec<&'static str> {
     flags
 }
 
-fn lib_name() -> &'static str {
-    return if cfg!(target_env = "msvc") {
-        "assimp-vc143-mt"
+fn lib_names() -> Vec<&'static str> {
+    let mut names = Vec::new();
+
+    if cfg!(target_env = "msvc") {
+        names.push("assimp-vc143-mt");
     } else {
-        "assimp"
-    };
+        names.push("assimp");
+    }
+
+    names.push("zlibstatic");
+
+    if cfg!(target_os = "linux") {
+        names.push("stdc++");
+    }
+
+    if cfg!(target_os = "macos") {
+        names.push("c++");
+    }
+
+    names
 }
 
 fn main() {
@@ -67,7 +71,7 @@ fn main() {
     let cmake_dir = cmake.build();
 
     bindgen::builder()
-        .header(WRAPPER_FILE)
+        .header("wrapper.h")
         .clang_arg(format!("-I{}", out_dir.join("include").display()))
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .allowlist_type("ai.*")
@@ -80,13 +84,15 @@ fn main() {
         .derive_debug(true)
         .generate()
         .unwrap()
-        .write_to_file(out_dir.join(BINDINGS_FILE))
+        .write_to_file(out_dir.join("bindings.rs"))
         .expect("Could not generate russimp bindings, for details see https://github.com/jkvargas/russimp-sys");
 
     println!(
         "cargo:rustc-link-search=native={}",
         cmake_dir.join("lib").display()
     );
-    println!("cargo:rustc-link-lib=static={}", lib_name());
-    println!("cargo:rustc-link-lib=static=zlibstatic");
+
+    for n in lib_names().iter() {
+        println!("cargo:rustc-link-lib=static={}", n);
+    }
 }
