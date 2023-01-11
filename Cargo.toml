@@ -26,6 +26,6 @@ nolibcxx = []
 
 [build-dependencies]
 bindgen = "0.63.0"
-num_cpus = "1.13"
+num_cpus = "1.13.1"
 cmake = "0.1.49"
 which = "4.3.0"

@@ -12,9 +12,7 @@
 #include <assimp/matrix4x4.h>
 #include <assimp/mesh.h>
 #include <assimp/metadata.h>
-#include <assimp/pbrmaterial.h>
 #include <assimp/postprocess.h>
-#include <assimp/quan.h>
 #include <assimp/scene.h>
 #include <assimp/texture.h>
 #include <assimp/types.h>
