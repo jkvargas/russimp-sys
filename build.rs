@@ -19,8 +19,12 @@ fn compiler_flags() -> Vec<&'static str> {
 fn lib_names() -> Vec<&'static str> {
     let mut names = Vec::new();
 
-    if cfg!(target_env = "msvc") {
-        names.push("assimp-vc143-mt");
+    if cfg!(target_os = "windows") {
+        if cfg!(target_env = "gnu") {
+            panic!("Windows GNU is not supported, assimp fails to build for some reason.\nSee https://github.com/assimp/assimp/issues/4868");
+        } else {
+            names.push("assimp-vc143-mt");
+        }
     } else {
         names.push("assimp");
     }
@@ -48,19 +52,22 @@ fn main() {
         "ON"
     };
 
+    // Build static libs?
+    let build_static = if cfg!(feature = "static-link") {
+        "ON"
+    } else {
+        "OFF"
+    };
+
     // CMake
     let mut cmake = cmake::Config::new("assimp");
     cmake
         .profile("Release")
         .static_crt(true)
-        .define("BUILD_SHARED_LIBS", "OFF")
+        .define("BUILD_SHARED_LIBS", build_static)
         .define("ASSIMP_BUILD_ASSIMP_TOOLS", "OFF")
         .define("ASSIMP_BUILD_TESTS", "OFF")
         .define("ASSIMP_BUILD_ZLIB", build_zlib);
-
-    if cfg!(target_os = "windows") && cfg!(target_env = "gnu") {
-        panic!("Windows GNU is not supported, assimp fails to build for some reason\nSee https://github.com/assimp/assimp/issues/4868");
-    }
 
     // Add compiler flags
     for flag in compiler_flags().iter() {
