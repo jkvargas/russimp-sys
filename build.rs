@@ -99,6 +99,11 @@ fn main() {
         cmake_dir.join("lib").display()
     );
 
+    println!(
+        "cargo:rustc-link-search=native={}",
+        cmake_dir.join("bin").display()
+    );
+
     for n in lib_names().iter() {
         println!("cargo:rustc-link-lib=static={}", n);
     }
