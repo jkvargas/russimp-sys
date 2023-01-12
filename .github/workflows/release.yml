@@ -30,7 +30,7 @@ jobs:
             triple: aarch64-apple-darwin
           - os: windows-2019
             triple: x86_64-pc-windows-msvc
-        features: ['static-link', 'static-link,nozlib']
+        features: ['static-link', 'static-link, nozlib']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
