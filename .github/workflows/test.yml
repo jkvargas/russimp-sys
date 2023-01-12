@@ -24,7 +24,7 @@ jobs:
         run: brew install llvm
         if: ${{ matrix.os == 'macos-latest' }}
       - name: Install LLVM on Linux
-        run: sudo update && apt install llvm-dev libclang-dev clang
+        run: sudo apt update && apt install llvm-dev libclang-dev clang -y
         if: ${{ matrix.os == 'ubuntu-latest' }}
       - name: Install CMake
         uses: lukka/get-cmake@latest
