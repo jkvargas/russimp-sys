@@ -8,7 +8,6 @@ env:
 jobs:
   cross-platform-build:
     runs-on: ${{ matrix.os }}
-    needs: install-deps
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
