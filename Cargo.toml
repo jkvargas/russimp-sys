@@ -19,8 +19,9 @@ doctest = false
 
 [features]
 default = []
-prebuilt = ["static-link"]
-static-link = []
+prebuilt = []
+build-assimp = []
+static-link = ["build-assimp"]
 nozlib = []
 nolibcxx = []
 

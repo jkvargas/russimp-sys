@@ -1,6 +1,15 @@
 use std::{env, fs, io, path::PathBuf};
-use std::io::Error;
 use flate2::read::GzDecoder;
+
+struct Library(&'static str, &'static str);
+
+const fn static_lib() -> &'static str {
+    return if cfg!(feature = "static-link") {
+        "static"
+    } else {
+        "dylib"
+    };
+}
 
 // Compiler specific compiler flags for CMake
 fn compiler_flags() -> Vec<&'static str> {
@@ -18,27 +27,27 @@ fn compiler_flags() -> Vec<&'static str> {
     flags
 }
 
-fn lib_names() -> Vec<&'static str> {
+fn lib_names() -> Vec<Library> {
     let mut names = Vec::new();
 
     if cfg!(target_os = "windows") {
         if cfg!(target_env = "gnu") {
             panic!("Windows GNU is not supported, assimp fails to build for some reason.\nSee https://github.com/assimp/assimp/issues/4868");
         } else {
-            names.push("assimp-vc143-mt");
+            names.push(Library("assimp-vc143-mt", static_lib()));
         }
     } else {
-        names.push("assimp");
+        names.push(Library("assimp", static_lib()));
     }
 
-    names.push("zlibstatic");
+    names.push(Library("zlibstatic", "static"));
 
     if cfg!(target_os = "linux") {
-        names.push("stdc++");
+        names.push(Library("stdc++","dylib"));
     }
 
     if cfg!(target_os = "macos") {
-        names.push("c++");
+        names.push( Library("c++", "dylib"));
     }
 
     names
@@ -114,9 +123,9 @@ fn link_from_package() {
 fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
 
-    if cfg!(not(feature = "prebuilt")) {
+    if cfg!(feature = "build-assimp") {
         build_from_source();
-    } else {
+    } else if cfg!(feature = "prebuilt") {
         link_from_package();
     }
 
@@ -139,6 +148,6 @@ fn main() {
         .expect("Could not generate russimp bindings, for details see https://github.com/jkvargas/russimp-sys");
 
     for n in lib_names().iter() {
-        println!("cargo:rustc-link-lib=static={}", n);
+        println!("cargo:rustc-link-lib={}={}", n.1, n.0);
     }
 }
