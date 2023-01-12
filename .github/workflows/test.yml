@@ -15,6 +15,9 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+      - name: macOS Xcode
+        run: 'sudo xcode-select --install'
+        if: ${{ matrix.os == 'macos-latest' }}
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@v1.6.1
         with:
