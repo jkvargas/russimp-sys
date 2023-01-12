@@ -15,14 +15,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
-#      - name: Install LLVM on Windows
-#        uses: KyleMayes/install-llvm-action@v1.6.1
-#        with:
-#          version: '14.0'
-#        if: ${{ matrix.os == 'windows-latest' }}
-      - name: Install LLVM on macOS
-        run: brew install llvm
-        if: ${{ matrix.os == 'macos-latest' }}
       - name: Install LLVM on Linux
         run: sudo apt update && sudo apt install llvm-dev libclang-dev clang -y
         if: ${{ matrix.os == 'ubuntu-latest' }}
