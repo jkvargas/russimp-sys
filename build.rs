@@ -1,4 +1,6 @@
-use std::{env, path::PathBuf};
+use std::{env, fs, io, path::PathBuf};
+use std::io::Error;
+use flate2::read::GzDecoder;
 
 // Compiler specific compiler flags for CMake
 fn compiler_flags() -> Vec<&'static str> {
@@ -42,9 +44,7 @@ fn lib_names() -> Vec<&'static str> {
     names
 }
 
-fn main() {
-    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
-
+fn build_from_source() {
     // Build Zlib from source?
     let build_zlib = if cfg!(feature = "nozlib") {
         "OFF"
@@ -77,9 +77,53 @@ fn main() {
 
     let cmake_dir = cmake.build();
 
+    println!(
+        "cargo:rustc-link-search=native={}",
+        cmake_dir.join("lib").display()
+    );
+
+    println!(
+        "cargo:rustc-link-search=native={}",
+        cmake_dir.join("bin").display()
+    );
+}
+
+fn link_from_package() {
+    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let target = env::var("TARGET").unwrap();
+    let crate_version = env::var("CARGO_PKG_VERSION").unwrap();
+    let archive_name = format!("russimp-{}-{}.tar.gz", crate_version, target);
+    let dl_link = format!("https://github.com/jkvargas/russimp-sys/releases/download/v{}/{}", crate_version, archive_name);
+
+    match fs::File::open(&out_dir.join(&archive_name)) {
+        Ok(_) => {}
+        Err(_) => {
+            let resp = reqwest::blocking::get(dl_link).unwrap();
+            let mut bytes = io::Cursor::new(resp.bytes().unwrap());
+
+            let mut file = fs::File::create(out_dir.join(&archive_name)).unwrap();
+            io::copy(&mut bytes, &mut file).unwrap();
+        }
+    }
+
+    let file = fs::File::open(out_dir.join(&archive_name)).unwrap();
+    let mut archive = tar::Archive::new(GzDecoder::new(file));
+    archive.unpack(out_dir).unwrap();
+}
+
+fn main() {
+    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+
+    if cfg!(not(feature = "prebuilt")) {
+        build_from_source();
+    } else {
+        link_from_package();
+    }
+
     bindgen::builder()
         .header("wrapper.h")
         .clang_arg(format!("-I{}", out_dir.join("include").display()))
+        .clang_arg(format!("-I{}", "assimp/include"))
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .allowlist_type("ai.*")
         .allowlist_function("ai.*")
@@ -93,16 +137,6 @@ fn main() {
         .unwrap()
         .write_to_file(out_dir.join("bindings.rs"))
         .expect("Could not generate russimp bindings, for details see https://github.com/jkvargas/russimp-sys");
-
-    println!(
-        "cargo:rustc-link-search=native={}",
-        cmake_dir.join("lib").display()
-    );
-
-    println!(
-        "cargo:rustc-link-search=native={}",
-        cmake_dir.join("bin").display()
-    );
 
     for n in lib_names().iter() {
         println!("cargo:rustc-link-lib=static={}", n);
