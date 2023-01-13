@@ -45,6 +45,13 @@ jobs:
           directory: ${{ runner.temp }}/llvm
           version: '14.0'
 
+      - name: Install GGC on aarch64
+        if: matrix.target.triple == 'aarch64-unknown-linux-gnu'
+        run: |
+          sudo apt update
+          sudo apt install -y gcc-aarch64-linux-gnu
+          sudo apt install -y g++-aarch64-linux-gnu
+
       - name: Install CMake
         uses: lukka/get-cmake@latest
         with:
