@@ -17,9 +17,9 @@ jobs:
           submodules: true
           depth: 1
 
-      - name: Cache LLVM Installation
+      - name: Cache LLVM
         id: llvm-cache
-
+        if: runner.os == 'Linux'
         uses: actions/cache@v3
         with:
           path: |
@@ -27,7 +27,7 @@ jobs:
           key: ${{ runner.os }}-llvm-14.0
 
       # LLVM comes preinstalled on Windows and macOS runners
-      - name: Install LLVM on Linux
+      - name: Install LLVM
         if: runner.os == 'Linux' && steps.llvm-cache.outputs.cache-hit != 'true'
         uses: KyleMayes/install-llvm-action@v1
         with:
@@ -45,10 +45,11 @@ jobs:
           toolchain: stable
           override: true
 
+      - name: Cache Rust
       - uses: Swatinem/rust-cache@v2
 
       - name: Build
         run: cargo build --features static-link
 
-      - name: Run Tests
+      - name: Test
         run: cargo test --lib --features static-link
