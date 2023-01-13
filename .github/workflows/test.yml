@@ -9,6 +9,7 @@ jobs:
   cross-platform-build:
     runs-on: ${{ matrix.target.os }}
     strategy:
+      fail-fast: false
       matrix:
         target:
           - os: ubuntu-latest
@@ -22,7 +23,6 @@ jobs:
           - os: windows-latest
             triple: x86_64-pc-windows-msvc
         features: [ 'build-assimp', 'static-link' ]
-    fail-fast: false
     steps:
       - uses: actions/checkout@v2
         with:
