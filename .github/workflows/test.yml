@@ -52,6 +52,12 @@ jobs:
           sudo apt install -y gcc-aarch64-linux-gnu
           sudo apt install -y g++-aarch64-linux-gnu
 
+      - name: Install OpenSSL on Linux
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y libssl-dev
+
       - name: Install CMake
         uses: lukka/get-cmake@latest
         with:
