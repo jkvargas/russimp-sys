@@ -1,5 +1,5 @@
-use std::{env, fs, io, path::PathBuf};
 use flate2::read::GzDecoder;
+use std::{env, fs, io, path::PathBuf};
 
 struct Library(&'static str, &'static str);
 
@@ -43,17 +43,19 @@ fn lib_names() -> Vec<Library> {
     names.push(Library("zlibstatic", "static"));
 
     if cfg!(target_os = "linux") {
-        names.push(Library("stdc++","dylib"));
+        names.push(Library("stdc++", "dylib"));
     }
 
     if cfg!(target_os = "macos") {
-        names.push( Library("c++", "dylib"));
+        names.push(Library("c++", "dylib"));
     }
 
     names
 }
 
 fn build_from_source() {
+    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+
     // Build Zlib from source?
     let build_zlib = if cfg!(feature = "nozlib") {
         "OFF"
@@ -73,6 +75,7 @@ fn build_from_source() {
     cmake
         .profile("Release")
         .static_crt(true)
+        .out_dir(out_dir.join(static_lib()))
         .define("BUILD_SHARED_LIBS", build_static)
         .define("ASSIMP_BUILD_ASSIMP_TOOLS", "OFF")
         .define("ASSIMP_BUILD_TESTS", "OFF")
@@ -102,7 +105,10 @@ fn link_from_package() {
     let target = env::var("TARGET").unwrap();
     let crate_version = env::var("CARGO_PKG_VERSION").unwrap();
     let archive_name = format!("russimp-{}-{}.tar.gz", crate_version, target);
-    let dl_link = format!("https://github.com/jkvargas/russimp-sys/releases/download/v{}/{}", crate_version, archive_name);
+    let dl_link = format!(
+        "https://github.com/jkvargas/russimp-sys/releases/download/v{}/{}",
+        crate_version, archive_name
+    );
 
     match fs::File::open(&out_dir.join(&archive_name)) {
         Ok(_) => {}
@@ -121,7 +127,10 @@ fn link_from_package() {
 }
 
 fn main() {
+    println!("cargo:rerun-if-changed=bin/package/main.rs");
+
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
     if cfg!(feature = "build-assimp") {
         build_from_source();
@@ -131,7 +140,7 @@ fn main() {
 
     bindgen::builder()
         .header("wrapper.h")
-        .clang_arg(format!("-I{}", out_dir.join("include").display()))
+        .clang_arg(format!("-I{}", out_dir.join(static_lib()).join("include").display()))
         .clang_arg(format!("-I{}", "assimp/include"))
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
         .allowlist_type("ai.*")
@@ -146,6 +155,15 @@ fn main() {
         .unwrap()
         .write_to_file(out_dir.join("bindings.rs"))
         .expect("Could not generate russimp bindings, for details see https://github.com/jkvargas/russimp-sys");
+
+    let mut built_opts = built::Options::default();
+    built_opts
+        .set_dependencies(false)
+        .set_compiler(false)
+        .set_ci(false)
+        .set_cfg(false);
+    built::write_built_file_with_opts(&built_opts, &manifest_dir, &out_dir.join("built.rs"))
+        .unwrap();
 
     for n in lib_names().iter() {
         println!("cargo:rustc-link-lib={}={}", n.1, n.0);

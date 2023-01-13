@@ -3,6 +3,10 @@
 #![allow(non_snake_case)]
 #![allow(improper_ctypes)]
 
+pub mod built_info {
+    include!(concat!(env!("OUT_DIR"), "/built.rs"));
+}
+
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 impl From<aiString> for String {

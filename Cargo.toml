@@ -17,6 +17,10 @@ name = "russimp_sys"
 path = "src/lib.rs"
 doctest = false
 
+[[bin]]
+name = "package"
+path = "bin/package/main.rs"
+
 [features]
 default = []
 prebuilt = []
@@ -25,8 +29,13 @@ static-link = ["build-assimp"]
 nozlib = []
 nolibcxx = []
 
+[dependencies]
+tar = "0.4.38"
+flate2 = "1.0.25"
+
 [build-dependencies]
 bindgen = "0.63.0"
+built = "0.5.2"
 cmake = "0.1.49"
 flate2 = "1.0.25"
 num_cpus = "1.13.1"
