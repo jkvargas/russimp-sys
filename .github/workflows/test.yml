@@ -47,5 +47,8 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
+      - name: Build
+        run: cargo build --features static-link
+
       - name: Run Tests
         run: cargo test --lib --features static-link
