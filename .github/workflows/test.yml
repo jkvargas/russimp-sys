@@ -68,7 +68,15 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build
-        run: cargo build --features ${{ matrix.features }} --target ${{ matrix.target.triple }}
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
 
       - name: Test
-        run: cargo test --features ${{ matrix.features }} --target ${{ matrix.target.triple }}
+        uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: test
+          args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
