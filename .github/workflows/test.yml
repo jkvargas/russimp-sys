@@ -15,15 +15,37 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: true
+          depth: 1
+
+      - name: Cache LLVM Installation
+        id: llvm-cache
+
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ runner.temp }}/llvm
+          key: ${{ runner.os }}-llvm-14.0
+
+      # LLVM comes preinstalled on Windows and macOS runners
       - name: Install LLVM on Linux
-        run: sudo apt update && sudo apt install llvm-dev libclang-dev clang -y
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: runner.os == 'Linux' && steps.llvm-cache.outputs.cache-hit != 'true'
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          directory: ${{ runner.temp }}/llvm
+          version: '14.0'
+
       - name: Install CMake
         uses: lukka/get-cmake@latest
+        with:
+          useLocalCache: true
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
+
+      - uses: Swatinem/rust-cache@v2
+
       - name: Run Tests
         run: cargo test --lib --features static-link
