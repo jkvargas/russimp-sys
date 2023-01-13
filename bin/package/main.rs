@@ -26,7 +26,7 @@ fn main() {
     let mut licence = File::open(manifest_dir.join(LICENSE_FILEPATH)).unwrap();
     let mut config_filename = File::open(from_dir.join(CONFIG_FILEPATH)).unwrap();
 
-    fs::create_dir_all(&out_dir).unwrap();
+    fs::create_dir_all(&out_dir.join("package")).unwrap();
     let tar_file = File::create(out_dir.join("package").join(&ar_filename)).unwrap();
     let mut archive = tar::Builder::new(GzEncoder::new(tar_file, Compression::default()));
 
