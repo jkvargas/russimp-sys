@@ -6,7 +6,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  cross-platform-build:
+  build-test:
     runs-on: ${{ matrix.target.os }}
     strategy:
       fail-fast: false
@@ -14,12 +14,8 @@ jobs:
         target:
           - os: ubuntu-latest
             triple: x86_64-unknown-linux-gnu
-          - os: ubuntu-latest
-            triple: aarch64-unknown-linux-gnu
           - os: macos-latest
             triple: x86_64-apple-darwin
-          - os: macos-latest
-            triple: aarch64-apple-darwin
           - os: windows-latest
             triple: x86_64-pc-windows-msvc
         features: [ 'build-assimp', 'static-link' ]
@@ -29,29 +25,14 @@ jobs:
           submodules: true
           depth: 1
 
-      - name: Cache LLVM
-        id: llvm-cache
-        if: runner.os == 'Linux'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ${{ runner.temp }}/llvm
-          key: ${{ runner.os }}-llvm-14.0
-
       # LLVM comes preinstalled on Windows and macOS runners
       - name: Install LLVM
         if: runner.os == 'Linux' && steps.llvm-cache.outputs.cache-hit != 'true'
         uses: KyleMayes/install-llvm-action@v1
         with:
           directory: ${{ runner.temp }}/llvm
+          cached: true
           version: '14.0'
-
-      - name: Install GGC on aarch64
-        if: matrix.target.triple == 'aarch64-unknown-linux-gnu'
-        run: |
-          sudo apt update
-          sudo apt install -y gcc-aarch64-linux-gnu
-          sudo apt install -y g++-aarch64-linux-gnu
 
       - name: Install CMake
         uses: lukka/get-cmake@latest
@@ -71,13 +52,11 @@ jobs:
       - name: Build
         uses: actions-rs/cargo@v1
         with:
-          use-cross: true
           command: build
           args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
 
       - name: Test
         uses: actions-rs/cargo@v1
         with:
-          use-cross: true
           command: test
           args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
