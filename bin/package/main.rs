@@ -8,13 +8,13 @@ const LICENSE_FILEPATH: &str = "LICENSE";
 const CONFIG_FILEPATH: &str = "include/assimp/config.h";
 
 const fn static_lib() -> &'static str {
-    return if cfg!(feature = "build-assimp") && cfg!(not(feature = "static-link")) {
+    if cfg!(feature = "build-assimp") && cfg!(not(feature = "static-link")) {
         "dylib"
     } else if cfg!(feature = "static-link") {
         "static"
     } else {
         ""
-    };
+    }
 }
 
 fn main() {
@@ -53,16 +53,10 @@ fn main() {
         .append_dir_all(format!("lib"), from_dir.join("lib"))
         .unwrap();
     archive
-        .append_file(
-            format!("{}", LICENSE_FILEPATH),
-            &mut licence,
-        )
+        .append_file(format!("{}", LICENSE_FILEPATH), &mut licence)
         .unwrap();
     archive
-        .append_file(
-            format!("{}", CONFIG_FILEPATH),
-            &mut config_filename,
-        )
+        .append_file(format!("{}", CONFIG_FILEPATH), &mut config_filename)
         .unwrap();
 
     archive.finish().unwrap();

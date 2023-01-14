@@ -4,11 +4,11 @@ use std::{env, fs, io, path::PathBuf};
 struct Library(&'static str, &'static str);
 
 const fn static_lib() -> &'static str {
-    return if cfg!(feature = "static-link") {
+    if cfg!(feature = "static-link") {
         "static"
     } else {
         "dylib"
-    };
+    }
 }
 
 // Compiler specific compiler flags for CMake
@@ -104,10 +104,15 @@ fn link_from_package() {
     let out_dir;
     let target = env::var("TARGET").unwrap();
     let crate_version = env::var("CARGO_PKG_VERSION").unwrap();
-    let archive_name = format!("russimp-{}-{}-{}.tar.gz", crate_version, target, static_lib());
+    let archive_name = format!(
+        "russimp-{}-{}-{}.tar.gz",
+        crate_version,
+        target,
+        static_lib()
+    );
 
     if option_env!("RUSSIMP_PACKAGE_DIR").is_some() {
-        out_dir = PathBuf::from(env!("RUSSIMP_PACKAGE_DIR"));
+        out_dir = PathBuf::from(env::var("RUSSIMP_PACKAGE_DIR").unwrap());
     } else {
         out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
         let dl_link = format!(
@@ -115,7 +120,7 @@ fn link_from_package() {
             crate_version, archive_name
         );
 
-        match fs::File::open(&out_dir.join(&archive_name)) {
+        match fs::File::open(out_dir.join(&archive_name)) {
             Ok(_) => {}
             Err(_) => {
                 let resp = reqwest::blocking::get(dl_link).unwrap();
