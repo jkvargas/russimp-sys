@@ -61,5 +61,8 @@ fn main() {
 
     archive.finish().unwrap();
 
-    println!("Package created at: {}", ar_dir.join(&ar_filename).display());
+    println!(
+        "Package created at: {}",
+        ar_dir.join(&ar_filename).display()
+    );
 }

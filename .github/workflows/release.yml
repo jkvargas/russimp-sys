@@ -31,7 +31,7 @@ jobs:
 
       # LLVM comes preinstalled on Windows and macOS runners
       - name: Install LLVM
-        if: runner.os == 'Linux' && steps.llvm-cache.outputs.cache-hit != 'true'
+        if: runner.os == 'Linux'
         uses: KyleMayes/install-llvm-action@v1
         with:
           directory: ${{ runner.temp }}/llvm
