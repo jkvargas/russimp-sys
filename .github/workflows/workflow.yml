@@ -73,13 +73,11 @@ jobs:
 
       - name: Create Release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v1
         with:
-          allowUpdates: true
-          artifacts: ${{ env.RUSSIMP_PACKAGE_DIR }}/*
-          artifactContentType: application/gzip
-          artifactErrorsFailBuild: true
+          files: ${{ runner.temp }}/russimp/*
           draft: true
+          generate_release_notes: true
           token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
         env:
           RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp
@@ -91,9 +89,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Publish Release
-        uses: ncipollo/release-action@v1
+        uses: softprops/action-gh-release@v1
         with:
-          allowUpdates: true
           token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
         env:
           RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp
