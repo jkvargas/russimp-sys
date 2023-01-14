@@ -85,9 +85,8 @@ jobs:
         with:
             generate_release_notes: true
             files: |
-                ${{ RUSSIMP_PACKAGE_DIR }}/*
+                ${{ env.RUSSIMP_PACKAGE_DIR }}/*
             token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
-
         env:
           RUSSIMP_PACKAGE_DIR: ./russimp-package
 
