@@ -9,6 +9,22 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  create-draft-release:
+    name: Create Draft Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Create Release on GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          generate_release_notes: true
+          token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
+
   build:
     name: Build
     runs-on: ${{ matrix.target.os }}
@@ -63,6 +79,15 @@ jobs:
         with:
           command: run
           args: --target ${{ matrix.target.triple }} --bin package --features ${{ matrix.features }}
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+            generate_release_notes: true
+            files: |
+                ${{ RUSSIMP_PACKAGE_DIR }}/*
+            token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
+
         env:
           RUSSIMP_PACKAGE_DIR: ./russimp-package
 
@@ -76,11 +101,8 @@ jobs:
         with:
           submodules: true
 
-      - name: Create Release
+      - name: Release to GitHub
         uses: softprops/action-gh-release@v1
         with:
-          files: |
-            ./russimp-package/*
-
           generate_release_notes: true
           token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
