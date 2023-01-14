@@ -75,8 +75,6 @@ jobs:
     needs: test
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
-    env:
-        RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -91,3 +89,5 @@ jobs:
           title: ${{ github.ref }}
           files: |
             ${{ env.RUSSIMP_PACKAGE_DIR }}/*
+        env:
+          RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp
