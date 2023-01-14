@@ -27,6 +27,7 @@ jobs:
 
   build:
     name: Build
+    needs: create-draft-release
     runs-on: ${{ matrix.target.os }}
     strategy:
       fail-fast: false
@@ -79,6 +80,8 @@ jobs:
         with:
           command: run
           args: --target ${{ matrix.target.triple }} --bin package --features ${{ matrix.features }}
+        env:
+          RUSSIMP_PACKAGE_DIR: ./russimp-package
 
       - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
