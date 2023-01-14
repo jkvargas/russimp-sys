@@ -9,8 +9,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  create-draft-release:
-    name: Create Draft Release
+  create-release:
+    name: Create Release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,7 +27,7 @@ jobs:
 
   build:
     name: Build
-    needs: create-draft-release
+    needs: create-release
     runs-on: ${{ matrix.target.os }}
     strategy:
       fail-fast: false
@@ -87,14 +87,15 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
             generate_release_notes: true
+            draft: true
             files: |
                 ${{ env.RUSSIMP_PACKAGE_DIR }}/*
             token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
         env:
           RUSSIMP_PACKAGE_DIR: ./russimp-package
 
-  release:
-    name: Release
+  publish:
+    name: Publish Release
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -103,8 +104,16 @@ jobs:
         with:
           submodules: true
 
-      - name: Release to GitHub
+      - name: Publish release on GitHub
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
           token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
+
+      - name: Create crates.io release
+        uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }} --token $CARGO_REGISTRY_TOKEN
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
