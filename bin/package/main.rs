@@ -8,14 +8,20 @@ const LICENSE_FILEPATH: &str = "LICENSE";
 const CONFIG_FILEPATH: &str = "include/assimp/config.h";
 
 const fn static_lib() -> &'static str {
-    return if cfg!(feature = "static-link") {
+    return if cfg!(feature = "build-assimp") && cfg!(not(feature = "static-link")) {
+        "dylib"
+    } else if cfg!(feature = "static-link") {
         "static"
     } else {
-        "dylib"
+        ""
     };
 }
 
 fn main() {
+    if static_lib().is_empty() {
+        panic!("Nothing to package.\nPlease enable either the `build-assimp` or `static-link` feature.");
+    }
+
     let out_dir = PathBuf::from(env!("OUT_DIR"));
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     let ar_dir = PathBuf::from(option_env!("RUSSIMP_PACKAGE_DIR").unwrap_or(env!("OUT_DIR")));
@@ -36,9 +42,12 @@ fn main() {
     let tar_file = File::create(ar_dir.join("package").join(&ar_filename)).unwrap();
     let mut archive = tar::Builder::new(GzEncoder::new(tar_file, Compression::default()));
 
-    archive
-        .append_dir_all(format!("{}/bin", static_lib()), from_dir.join("bin"))
-        .unwrap();
+    if static_lib() == "dylib" {
+        archive
+            .append_dir_all(format!("{}/bin", static_lib()), from_dir.join("bin"))
+            .unwrap();
+    }
+
     archive
         .append_dir_all(format!("{}/lib", static_lib()), from_dir.join("lib"))
         .unwrap();
