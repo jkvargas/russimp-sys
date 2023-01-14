@@ -1,4 +1,4 @@
-name: Test
+name: Workflow
 
 on: [ push, pull_request ]
 
@@ -7,6 +7,7 @@ env:
 
 jobs:
   test:
+    name: Test
     runs-on: ${{ matrix.target.os }}
     strategy:
       fail-fast: false
