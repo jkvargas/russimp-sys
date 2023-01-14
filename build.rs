@@ -101,23 +101,29 @@ fn build_from_source() {
 }
 
 fn link_from_package() {
-    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let out_dir;
     let target = env::var("TARGET").unwrap();
     let crate_version = env::var("CARGO_PKG_VERSION").unwrap();
-    let archive_name = format!("russimp-{}-{}.tar.gz", crate_version, target);
-    let dl_link = format!(
-        "https://github.com/jkvargas/russimp-sys/releases/download/v{}/{}",
-        crate_version, archive_name
-    );
+    let archive_name = format!("russimp-{}-{}-{}.tar.gz", crate_version, target, static_lib());
 
-    match fs::File::open(&out_dir.join(&archive_name)) {
-        Ok(_) => {}
-        Err(_) => {
-            let resp = reqwest::blocking::get(dl_link).unwrap();
-            let mut bytes = io::Cursor::new(resp.bytes().unwrap());
+    if option_env!("RUSSIMP_PACKAGE_DIR").is_some() {
+        out_dir = PathBuf::from(env!("RUSSIMP_PACKAGE_DIR"));
+    } else {
+        out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+        let dl_link = format!(
+            "https://github.com/jkvargas/russimp-sys/releases/download/v{}/{}",
+            crate_version, archive_name
+        );
 
-            let mut file = fs::File::create(out_dir.join(&archive_name)).unwrap();
-            io::copy(&mut bytes, &mut file).unwrap();
+        match fs::File::open(&out_dir.join(&archive_name)) {
+            Ok(_) => {}
+            Err(_) => {
+                let resp = reqwest::blocking::get(dl_link).unwrap();
+                let mut bytes = io::Cursor::new(resp.bytes().unwrap());
+
+                let mut file = fs::File::create(out_dir.join(&archive_name)).unwrap();
+                io::copy(&mut bytes, &mut file).unwrap();
+            }
         }
     }
 

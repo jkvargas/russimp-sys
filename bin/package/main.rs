@@ -38,29 +38,29 @@ fn main() {
     let mut licence = File::open(manifest_dir.join(LICENSE_FILEPATH)).unwrap();
     let mut config_filename = File::open(from_dir.join(CONFIG_FILEPATH)).unwrap();
 
-    fs::create_dir_all(&ar_dir.join("package")).unwrap();
-    let tar_file = File::create(ar_dir.join("package").join(&ar_filename)).unwrap();
+    fs::create_dir_all(&ar_dir).unwrap();
+    let tar_file = File::create(ar_dir.join(&ar_filename)).unwrap();
     let mut archive = tar::Builder::new(GzEncoder::new(tar_file, Compression::default()));
 
     // On Windows, the dynamic libraries are located in the bin directory.
     if static_lib() == "dylib" && cfg!(target_env = "msvc") {
         archive
-            .append_dir_all(format!("{}/bin", static_lib()), from_dir.join("bin"))
+            .append_dir_all(format!("bin"), from_dir.join("bin"))
             .unwrap();
     }
 
     archive
-        .append_dir_all(format!("{}/lib", static_lib()), from_dir.join("lib"))
+        .append_dir_all(format!("lib"), from_dir.join("lib"))
         .unwrap();
     archive
         .append_file(
-            format!("{}/{}", static_lib(), LICENSE_FILEPATH),
+            format!("{}", LICENSE_FILEPATH),
             &mut licence,
         )
         .unwrap();
     archive
         .append_file(
-            format!("{}/{}", static_lib(), CONFIG_FILEPATH),
+            format!("{}", CONFIG_FILEPATH),
             &mut config_filename,
         )
         .unwrap();
