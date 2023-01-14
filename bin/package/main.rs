@@ -42,7 +42,8 @@ fn main() {
     let tar_file = File::create(ar_dir.join("package").join(&ar_filename)).unwrap();
     let mut archive = tar::Builder::new(GzEncoder::new(tar_file, Compression::default()));
 
-    if static_lib() == "dylib" {
+    // On Windows, the dynamic libraries are located in the bin directory.
+    if static_lib() == "dylib" && cfg!(target_env = "msvc") {
         archive
             .append_dir_all(format!("{}/bin", static_lib()), from_dir.join("bin"))
             .unwrap();

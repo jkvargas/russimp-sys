@@ -16,8 +16,6 @@ jobs:
             triple: x86_64-unknown-linux-gnu
           - os: macos-latest
             triple: x86_64-apple-darwin
-          - os: macos-latest
-            triple: aarch64-apple-darwin
           - os: windows-latest
             triple: x86_64-pc-windows-msvc
         features: [ 'build-assimp', 'static-link' ]
@@ -62,10 +60,8 @@ jobs:
         with:
           command: test
           args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
-        if: ${{ matrix.target.triple }} != 'aarch64-apple-darwin'
 
       - name: Package Assimp
-        if: ${{ matrix.target.triple }} != 'aarch64-apple-darwin'
         uses: actions-rs/cargo@v1
         with:
           command: run
