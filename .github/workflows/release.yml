@@ -87,7 +87,7 @@ jobs:
           submodules: true
 
       - name: Publish Release
-        uses: softprops/action-gh-release@v1.1.3
+        uses: softprops/action-gh-release@v1
         with:
           token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
           draft: false
