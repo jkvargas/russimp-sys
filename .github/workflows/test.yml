@@ -6,7 +6,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build-test:
+  test:
     runs-on: ${{ matrix.target.os }}
     strategy:
       fail-fast: false
@@ -16,6 +16,8 @@ jobs:
             triple: x86_64-unknown-linux-gnu
           - os: macos-latest
             triple: x86_64-apple-darwin
+          - os: macos-latest
+            triple: aarch64-apple-darwin
           - os: windows-latest
             triple: x86_64-pc-windows-msvc
         features: [ 'build-assimp', 'static-link' ]
@@ -60,3 +62,35 @@ jobs:
         with:
           command: test
           args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
+        if: ${{ matrix.target.triple }} != 'aarch64-apple-darwin'
+
+      - name: Package Assimp
+        if: ${{ matrix.target.triple }} != 'aarch64-apple-darwin'
+        uses: actions-rs/cargo@v1
+        with:
+          command: run
+          args: --target ${{ matrix.target.triple }} --bin package --features ${{ matrix.features }}
+        env:
+          RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp
+
+#  create-release:
+#    name: Create Release
+#    needs: test
+#    if: startsWith(github.ref, 'refs/tags/v')
+#    runs-on: ${{ matrix.target.os }}
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        target:
+#          - os: ubuntu-latest
+#            triple: x86_64-unknown-linux-gnu
+#          - os: macos-latest
+#            triple: x86_64-apple-darwin
+#          - os: macos-latest
+#            triple: aarch64-apple-darwin
+#          - os: windows-latest
+#            triple: x86_64-pc-windows-msvc
+#        features: [ 'build-assimp', 'static-link' ]
+#      env:
+#        RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp
+#    steps:

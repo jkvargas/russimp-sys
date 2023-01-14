@@ -18,16 +18,22 @@ const fn static_lib() -> &'static str {
 fn main() {
     let out_dir = PathBuf::from(env!("OUT_DIR"));
     let manifest_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let ar_dir = PathBuf::from(option_env!("RUSSIMP_PACKAGE_DIR").unwrap_or(env!("OUT_DIR")));
 
     let target = russimp_sys::built_info::TARGET;
-    let ar_filename = format!("russimp-{}-{}.tar.gz", env!("CARGO_PKG_VERSION"), target);
+    let ar_filename = format!(
+        "russimp-{}-{}-{}.tar.gz",
+        env!("CARGO_PKG_VERSION"),
+        target,
+        static_lib()
+    );
 
     let from_dir = out_dir.join(static_lib());
     let mut licence = File::open(manifest_dir.join(LICENSE_FILEPATH)).unwrap();
     let mut config_filename = File::open(from_dir.join(CONFIG_FILEPATH)).unwrap();
 
-    fs::create_dir_all(&out_dir.join("package")).unwrap();
-    let tar_file = File::create(out_dir.join("package").join(&ar_filename)).unwrap();
+    fs::create_dir_all(&ar_dir.join("package")).unwrap();
+    let tar_file = File::create(ar_dir.join("package").join(&ar_filename)).unwrap();
     let mut archive = tar::Builder::new(GzEncoder::new(tar_file, Compression::default()));
 
     archive
@@ -48,4 +54,6 @@ fn main() {
             &mut config_filename,
         )
         .unwrap();
+
+    archive.finish().unwrap();
 }
