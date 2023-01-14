@@ -66,16 +66,6 @@ jobs:
         env:
           RUSSIMP_PACKAGE_DIR: ./russimp-package
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            ./russimp-package/*
-
-          draft: true
-          generate_release_notes: true
-          token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
-
   release:
     name: Release
     needs: build
@@ -86,8 +76,12 @@ jobs:
         with:
           submodules: true
 
-      - name: Publish Release
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
+          files: |
+            ./russimp-package/*
+
+          draft: true
+          generate_release_notes: true
           token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
-          draft: false
