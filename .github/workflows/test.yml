@@ -93,6 +93,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
-          token: ${{ secrets.ACCESS_TOKEN }}
+          token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
         env:
           RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp
