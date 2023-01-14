@@ -70,12 +70,10 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ RUSSIMP_PACKAGE_DIR }}/*
+          files: ./russimp-package/*
           draft: true
           generate_release_notes: true
           token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
-        env:
-          RUSSIMP_PACKAGE_DIR: ./russimp-package
 
   release:
     name: Release
