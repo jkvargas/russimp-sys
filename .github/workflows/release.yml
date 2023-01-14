@@ -82,6 +82,5 @@ jobs:
           files: |
             ./russimp-package/*
 
-          draft: true
           generate_release_notes: true
           token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
