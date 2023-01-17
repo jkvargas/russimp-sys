@@ -3,7 +3,7 @@ name: Test
 on:
   push:
     branches:
-      - '**'
+        - '**'
     tags:
       - '!v*' # Exclude tags starting with 'v'
     pull_request:
@@ -44,7 +44,7 @@ jobs:
       # CMake and Rust are preinstalled on all runners.
 
       - name: Update Rust
-        run: |
+        run: | 
           rustup update stable
           rustup target add ${{ matrix.target.triple }}
 
