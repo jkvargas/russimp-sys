@@ -61,11 +61,7 @@ fn build_from_source() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
 
     // Build Zlib from source?
-    let build_zlib = if build_zlib() {
-        "OFF"
-    } else {
-        "ON"
-    };
+    let build_zlib = if build_zlib() { "OFF" } else { "ON" };
 
     // Build static libs?
     let build_static = if static_lib() == "static" {
