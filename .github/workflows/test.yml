@@ -3,9 +3,9 @@ name: Test
 on:
   push:
     branches:
-
-    tags-ignore:
-      - 'v*'
+        - '**'
+    tags:
+      - '!v*'
     pull_request:
 
 env:
