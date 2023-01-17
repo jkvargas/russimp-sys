@@ -27,7 +27,7 @@ jobs:
         with:
           submodules: true
 
-      # LLVM comes preinstalled on Windows and macOS runners
+      # LLVM comes preinstalled on Windows and macOS runners.
       - name: Install LLVM
         if: runner.os == 'Linux'
         uses: KyleMayes/install-llvm-action@v1
@@ -36,10 +36,7 @@ jobs:
           cached: true
           version: '14.0'
 
-      - name: Install CMake
-        uses: lukka/get-cmake@latest
-        with:
-          useLocalCache: true
+      # CMake is preinstalled on all runners.
 
       - name: Install Rust
         uses: actions-rs/toolchain@v1

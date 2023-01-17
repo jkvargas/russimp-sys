@@ -39,11 +39,6 @@ jobs:
           cached: true
           version: '14.0'
 
-      - name: Install CMake
-        uses: lukka/get-cmake@latest
-        with:
-          useLocalCache: true
-
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
