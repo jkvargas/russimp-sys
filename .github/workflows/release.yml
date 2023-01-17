@@ -23,7 +23,8 @@ jobs:
             triple: x86_64-pc-windows-msvc
         features: [ 'build-assimp', 'static-link' ]
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           submodules: true
 
@@ -36,29 +37,21 @@ jobs:
           cached: true
           version: '14.0'
 
-      # CMake is preinstalled on all runners.
+      # CMake and Rust are preinstalled on all runners.
 
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          target: ${{ matrix.target.triple }}
+      - name: Update Rust
+        run: |
+          rustup update stable
+          rustup target add ${{ matrix.target.triple }}
 
       - name: Cache Rust
         uses: Swatinem/rust-cache@v2
 
       - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
+        run: cargo build --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
 
       - name: Package Assimp
-        uses: actions-rs/cargo@v1
-        with:
-          command: run
-          args: --target ${{ matrix.target.triple }} --bin package --features ${{ matrix.features }}
+        run: cargo run --bin package --target ${{ matrix.target.triple }} --bin package --features ${{ matrix.features }}
         env:
           RUSSIMP_PACKAGE_DIR: ./russimp-package
 
@@ -88,7 +81,7 @@ jobs:
 
       - name: List artifacts
         run: |
-          echo "Recieved artifacts:"
+          echo "Received artifacts:"
           ls -l $RUSSIMP_PACKAGE_DIR
 
       - name: Publish release on GitHub

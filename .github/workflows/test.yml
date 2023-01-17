@@ -39,24 +39,18 @@ jobs:
           cached: true
           version: '14.0'
 
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          target: ${{ matrix.target.triple }}
+      # CMake and Rust are preinstalled on all runners.
+
+      - name: Update Rust
+        run: | 
+          rustup update stable
+          rustup target add ${{ matrix.target.triple }}
 
       - name: Cache Rust
         uses: Swatinem/rust-cache@v2
 
       - name: Build
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
+        run: cargo build --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
 
       - name: Test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
+        run: cargo test --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
