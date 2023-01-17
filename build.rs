@@ -11,6 +11,10 @@ const fn static_lib() -> &'static str {
     }
 }
 
+const fn build_zlib() -> bool {
+    cfg!(feature = "build-zlib")
+}
+
 // Compiler specific compiler flags for CMake
 fn compiler_flags() -> Vec<&'static str> {
     let mut flags = Vec::new();
@@ -36,7 +40,11 @@ fn lib_names() -> Vec<Library> {
         names.push(Library("assimp", static_lib()));
     }
 
-    names.push(Library("zlibstatic", "static"));
+    if cfg!(feature = "nozlib") {
+        names.push(Library("z", "dylib"));
+    } else {
+        names.push(Library("zlibstatic", "static"));
+    }
 
     if cfg!(target_os = "linux") {
         names.push(Library("stdc++", "dylib"));
@@ -53,14 +61,14 @@ fn build_from_source() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
 
     // Build Zlib from source?
-    let build_zlib = if cfg!(feature = "nozlib") {
+    let build_zlib = if build_zlib() {
         "OFF"
     } else {
         "ON"
     };
 
     // Build static libs?
-    let build_static = if cfg!(feature = "static-link") {
+    let build_static = if static_lib() == "static" {
         "OFF"
     } else {
         "ON"
