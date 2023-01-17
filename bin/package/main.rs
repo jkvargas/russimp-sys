@@ -1,3 +1,5 @@
+use russimp_sys::*;
+
 use flate2::read::GzEncoder;
 use flate2::Compression;
 use std::fs::File;
@@ -61,8 +63,13 @@ fn main() {
 
     archive.finish().unwrap();
 
-    println!(
-        "Package created at: {}",
-        ar_dir.join(&ar_filename).display()
-    );
+    unsafe {
+        println!(
+            "Package created at: {}\nAssimp version: {}.{}.{}",
+            ar_dir.join(&ar_filename).display(),
+            aiGetVersionMajor(),
+            aiGetVersionMinor(),
+            aiGetVersionPatch(),
+        );
+    }
 }
