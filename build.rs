@@ -64,11 +64,7 @@ fn build_from_source() {
     let build_zlib = if build_zlib() { "OFF" } else { "ON" };
 
     // Build static libs?
-    let build_static = if static_lib() == "dylib" {
-        "OFF"
-    } else {
-        "ON"
-    };
+    let build_static = if static_lib() == "dylib" { "OFF" } else { "ON" };
 
     // CMake
     let mut cmake = cmake::Config::new("assimp");
