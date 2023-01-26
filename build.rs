@@ -12,7 +12,7 @@ const fn static_lib() -> &'static str {
 }
 
 const fn build_zlib() -> bool {
-    cfg!(feature = "build-zlib")
+    cfg!(not(feature = "nozlib"))
 }
 
 // Compiler specific compiler flags for CMake
