@@ -26,7 +26,7 @@ However there are many ways for the crate to install the library for you by spec
 ### `prebuilt`
 This features will download a prebuilt package from this repo's release page, these packages are built and published automatically every time we release a new version. 
 
-In addition, you can specify a local package by setting the `ASSIMP_PACKAGE_DIR` environment variable to the path of the package.
+In addition, you can specify a local package by setting the `RUSSIMP_PACKAGE_DIR` environment variable to the path of the package.
 You can run the provided package binary to generate a package for your platform.
 
 ```cargo run --bin package --features <INSERT-LINK-TYPE>```
@@ -45,14 +45,19 @@ Building from source requires the following dependencies:
 
 ### `nozlib`
 
-By default `russimp-sys` will statically link `zlibstatic`, enabling this feature will make the crate link to the system's `zlib` library.
+By default `russimp-sys` will statically link `zlibstatic`. Enabling this feature will link to the system's `zlib` library.
 
 ### `nolibcxx`
 
 By default `russimp-sys` links to `libstdc++` on Linux and `libc++` on macOS. Enabling this feature won't link to any C++ standard library.
 
 ## Changelog
-
+### 2.0.0
+* Complete overhaul of the build script.
+* Expose all assimp headers.
+* Rework CI pipeline.
+* Support for local assimp packaging and local package usage. (See: `prebuilt` feature)
+* Remove vcpkg support.
 ### 1.0.3
 * Builds based on 5.2.5 release
 ### 1.0.0
