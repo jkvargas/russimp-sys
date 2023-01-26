@@ -92,6 +92,6 @@ jobs:
             This release was automatically created by GitHub Actions.
           files: |
             ${{ env.RUSSIMP_PACKAGE_DIR }}/*
-          token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
+          token: ${{ secrets.CRATESIO_TOKEN }}
     env:
       RUSSIMP_PACKAGE_DIR: ./russimp-package
