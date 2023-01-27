@@ -2,7 +2,7 @@
 name = "russimp-sys"
 version = "1.0.3"
 authors = ["Jhonny Knaak de Vargas"]
-edition = "2018"
+edition = "2021"
 license-file = "LICENSE"
 readme = "README.md"
 homepage = "https://github.com/jkvargas/russimp-sys"
@@ -27,7 +27,6 @@ prebuilt = []
 build-assimp = []
 static-link = ["build-assimp"]
 nozlib = []
-nolibcxx = []
 
 [dependencies]
 tar = "0.4.38"
@@ -38,7 +37,6 @@ bindgen = "0.63.0"
 built = "0.5.2"
 cmake = "0.1.49"
 flate2 = "1.0.25"
-num_cpus = "1.13.1"
 reqwest =  { version = "0.11.13", features = ["blocking", "rustls-tls"] }
 tar = "0.4.38"
 which = "4.3.0"
