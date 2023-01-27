@@ -26,7 +26,6 @@ default = []
 prebuilt = []
 build-assimp = []
 static-link = ["build-assimp"]
-nozlib = []
 
 [dependencies]
 tar = "0.4.38"

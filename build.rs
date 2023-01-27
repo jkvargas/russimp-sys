@@ -40,10 +40,10 @@ fn lib_names() -> Vec<Library> {
         names.push(Library("assimp", static_lib()));
     }
 
-    if cfg!(feature = "nozlib") {
-        names.push(Library("z", "dylib"));
-    } else {
+    if build_zlib() {
         names.push(Library("zlibstatic", "static"));
+    } else {
+        names.push(Library("z", "dylib"));
     }
 
     if cfg!(target_os = "linux") {

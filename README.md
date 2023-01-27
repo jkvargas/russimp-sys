@@ -47,10 +47,6 @@ Building from source requires the following dependencies:
 
 By default `russimp-sys` will statically link `zlibstatic`. Enabling this feature will link to the system's `zlib` library.
 
-### `nolibcxx`
-
-By default `russimp-sys` links to `libstdc++` on Linux and `libc++` on macOS. Enabling this feature won't link to any C++ standard library.
-
 ## Changelog
 ### 2.0.0
 * Complete overhaul of the build script.
