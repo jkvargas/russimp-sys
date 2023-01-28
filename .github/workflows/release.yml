@@ -94,8 +94,8 @@ jobs:
           files: |
             ${{ env.RUSSIMP_PACKAGE_DIR }}/*
           token: ${{ secrets.RUSSIMP_FORK_TOEKN }}
-          env:
-            RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp-package
+        env:
+          RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp-package
 
       - name: Publish release on crates.io
         run: cargo publish --features prebuilt
