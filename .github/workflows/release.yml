@@ -93,12 +93,12 @@ jobs:
             This release was automatically created by GitHub Actions.
           files: |
             ${{ env.RUSSIMP_PACKAGE_DIR }}/*
-          token: ${{ secrets.RUSSIMP_FORK_TOKEN }}
+          token: ${{ secrets.ACCESS_TOKEN }}
         env:
           RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp-package
 
       - name: Publish release on crates.io
         run: cargo publish --features prebuilt --token $CRATES_IO_TOKEN
         env:
-          CRATES_IO_TOKEN: ${{ secrets.RUSSIMP_FORK_CRATES_IO_TOKEN }}
+          CRATES_IO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
           RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp-package
