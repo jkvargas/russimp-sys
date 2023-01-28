@@ -54,6 +54,7 @@ By default `russimp-sys` will statically link `zlibstatic`. Enabling this featur
 * Rework CI pipeline.
 * Support for local assimp packaging and local package usage. (See: `prebuilt` feature)
 * Remove vcpkg support.
+* Remove `nolibcxx` feature.
 ### 1.0.3
 * Builds based on 5.2.5 release
 ### 1.0.0
