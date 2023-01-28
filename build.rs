@@ -170,6 +170,7 @@ fn main() {
         .set_compiler(false)
         .set_ci(false)
         .set_cfg(false);
+
     built::write_built_file_with_opts(&built_opts, &manifest_dir, &out_dir.join("built.rs"))
         .unwrap();
 
