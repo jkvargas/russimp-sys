@@ -98,4 +98,4 @@ jobs:
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
     env:
-      RUSSIMP_PACKAGE_DIR: $RUNNER_TEMP  # This is fine, because the runner is Linux.
+      RUSSIMP_PACKAGE_DIR: ${{ format({0}, runner.temp) }}  # This is fine, because the runner is Linux.
