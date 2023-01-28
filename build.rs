@@ -61,10 +61,14 @@ fn build_from_source() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
 
     // Build Zlib from source?
-    let build_zlib = if build_zlib() { "OFF" } else { "ON" };
+    let build_zlib = if build_zlib() { "ON" } else { "OFF" };
 
     // Build static libs?
-    let build_static = if static_lib() == "dylib" { "OFF" } else { "ON" };
+    let build_shared = if static_lib() == "static" {
+        "OFF"
+    } else {
+        "ON"
+    };
 
     // CMake
     let mut cmake = cmake::Config::new("assimp");
@@ -72,7 +76,7 @@ fn build_from_source() {
         .profile("Release")
         .static_crt(true)
         .out_dir(out_dir.join(static_lib()))
-        .define("BUILD_SHARED_LIBS", build_static)
+        .define("BUILD_SHARED_LIBS", build_shared)
         .define("ASSIMP_BUILD_ASSIMP_TOOLS", "OFF")
         .define("ASSIMP_BUILD_TESTS", "OFF")
         .define("ASSIMP_BUILD_ZLIB", build_zlib)
@@ -98,7 +102,7 @@ fn build_from_source() {
 }
 
 fn link_from_package() {
-    let out_dir;
+    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let target = env::var("TARGET").unwrap();
     let crate_version = env::var("CARGO_PKG_VERSION").unwrap();
     let archive_name = format!(
@@ -108,30 +112,46 @@ fn link_from_package() {
         static_lib()
     );
 
+    let ar_src_dir;
+
     if option_env!("RUSSIMP_PACKAGE_DIR").is_some() {
-        out_dir = PathBuf::from(env::var("RUSSIMP_PACKAGE_DIR").unwrap());
+        ar_src_dir = PathBuf::from(env::var("RUSSIMP_PACKAGE_DIR").unwrap());
     } else {
-        out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
+        ar_src_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
         let dl_link = format!(
             "https://github.com/jkvargas/russimp-sys/releases/download/v{}/{}",
             crate_version, archive_name
         );
 
-        match fs::File::open(out_dir.join(&archive_name)) {
+        match fs::File::open(ar_src_dir.join(&archive_name)) {
             Ok(_) => {}
             Err(_) => {
                 let resp = reqwest::blocking::get(dl_link).unwrap();
                 let mut bytes = io::Cursor::new(resp.bytes().unwrap());
 
-                let mut file = fs::File::create(out_dir.join(&archive_name)).unwrap();
+                let mut file = fs::File::create(ar_src_dir.join(&archive_name)).unwrap();
                 io::copy(&mut bytes, &mut file).unwrap();
             }
         }
     }
 
-    let file = fs::File::open(out_dir.join(&archive_name)).unwrap();
+    dbg!(ar_src_dir.join(&archive_name));
+
+    let file = fs::File::open(ar_src_dir.join(&archive_name)).unwrap();
     let mut archive = tar::Archive::new(GzDecoder::new(file));
-    archive.unpack(out_dir).unwrap();
+    let ar_dest_dir = out_dir.join(static_lib());
+
+    archive.unpack(&ar_dest_dir).unwrap();
+
+    println!(
+        "cargo:rustc-link-search=native={}",
+        ar_dest_dir.join("lib").display()
+    );
+
+    println!(
+        "cargo:rustc-link-search=native={}",
+        ar_dest_dir.join("bin").display()
+    );
 }
 
 fn main() {

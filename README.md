@@ -49,7 +49,8 @@ By default `russimp-sys` will statically link `zlibstatic`. Enabling this featur
 
 ## Changelog
 ### 2.0.0
-* Complete overhaul of the build script.
+* Complete overhaul of the build process.
+
 * Expose all assimp headers.
 * Rework CI pipeline.
 * Support for local assimp packaging and local package usage. (See: `prebuilt` feature)

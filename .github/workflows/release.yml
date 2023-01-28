@@ -84,6 +84,10 @@ jobs:
           echo "Received artifacts:"
           ls -l $RUSSIMP_PACKAGE_DIR
 
+      - name: Package crate
+        run: |
+          cargo package --features prebuilt
+
       - name: Publish release on GitHub
         uses: softprops/action-gh-release@v1
         with:
@@ -92,6 +96,6 @@ jobs:
             This release was automatically created by GitHub Actions.
           files: |
             ${{ env.RUSSIMP_PACKAGE_DIR }}/*
-          token: ${{ secrets.CRATESIO_TOKEN }}
+          token: ${{ secrets.RUSSIMP_FORK_TOEKN }}
     env:
       RUSSIMP_PACKAGE_DIR: ./russimp-package
