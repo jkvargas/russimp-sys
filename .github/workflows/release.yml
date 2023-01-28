@@ -99,4 +99,4 @@ jobs:
             ${{ env.RUSSIMP_PACKAGE_DIR }}/*
           token: ${{ secrets.RUSSIMP_FORK_TOEKN }}
     env:
-      RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp-package
+      RUSSIMP_PACKAGE_DIR: /tmp/russimp-package # This is fine, because the runner is Linux.
