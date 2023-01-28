@@ -155,8 +155,6 @@ fn link_from_package() {
 }
 
 fn main() {
-    println!("cargo:rerun-if-changed=bin/package/main.rs");
-
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 

@@ -9,7 +9,7 @@ homepage = "https://github.com/jkvargas/russimp-sys"
 categories = ["rendering", "external-ffi-bindings", "game-engines", "multimedia"]
 keywords = ["assimp", "3d", "blend", "3ds", "glTF"]
 repository = "https://github.com/jkvargas/russimp-sys"
-description = "Raw Assimp bindings for rust"
+description = "Raw Assimp bindings for Rust"
 exclude = ["/assimp", "*.bash", "*.ps1"]
 
 [lib]
@@ -23,13 +23,13 @@ path = "bin/package/main.rs"
 
 [features]
 default = []
-prebuilt = []
 build-assimp = []
+prebuilt = []
 static-link = ["build-assimp"]
 
 [dependencies]
-tar = "0.4.38"
 flate2 = "1.0.25"
+tar = "0.4.38"
 
 [build-dependencies]
 bindgen = "0.63.0"
