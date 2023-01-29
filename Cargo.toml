@@ -1,42 +1,41 @@
 [package]
 name = "russimp-sys"
-version = "1.0.3"
+version = "2.0.0"
 authors = ["Jhonny Knaak de Vargas"]
-edition = "2018"
+edition = "2021"
 license-file = "LICENSE"
 readme = "README.md"
 homepage = "https://github.com/jkvargas/russimp-sys"
 categories = ["rendering", "external-ffi-bindings", "game-engines", "multimedia"]
 keywords = ["assimp", "3d", "blend", "3ds", "glTF"]
 repository = "https://github.com/jkvargas/russimp-sys"
-description = "Raw Assimp bindings for rust"
+description = "Raw Assimp bindings for Rust"
 exclude = ["/assimp", "*.bash", "*.ps1"]
 
 [lib]
 name = "russimp_sys"
 path = "src/lib.rs"
+doctest = false
+
+[[bin]]
+name = "package"
+path = "bin/package/main.rs"
 
 [features]
 default = []
-prebuilt = ["static-link"]
-static-link = []
-nozlib = []
-nolibcxx = []
+build-assimp = []
+prebuilt = []
+static-link = ["build-assimp"]
+
+[dependencies]
+flate2 = "1.0.25"
+tar = "0.4.38"
 
 [build-dependencies]
-bindgen = "0.59.2"
-vcpkg = "0.2.15"
-ureq = "2.5"
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-tar = "0.4"
-flate2 = "1.0"
-num_cpus = "1.13"
-
-[package.metadata.vcpkg]
-git = "https://github.com/microsoft/vcpkg"
-rev = "7178ff9"
-
-[package.metadata.vcpkg.target]
-x86_64-pc-windows-msvc = { triplet = "x64-windows-static-md", install = ["assimp", "zlib"] }
-x86-pc-windows-msvc = { triplet = "x86-windows-static-md", install = ["assimp", "zlib"] }
+bindgen = "0.63.0"
+built = "0.5.2"
+cmake = "0.1.49"
+flate2 = "1.0.25"
+reqwest =  { version = "0.11.13", features = ["blocking", "rustls-tls"] }
+tar = "0.4.38"
+which = "4.3.0"

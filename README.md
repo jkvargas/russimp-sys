@@ -1,55 +1,61 @@
 # russimp-sys ![russimp-sys](https://github.com/jkvargas/russimp-sys/workflows/russimp-sys/badge.svg?branch=main) [![Crates.io](https://img.shields.io/crates/v/russimp-sys.svg)](https://crates.io/crates/russimp-sys)
 
-Assimp raw bindings for Rust.
+Unsafe Rust bindings for the Open Asset Import Library (assimp).  
+See: [Our safe assimp Rust library](https://github.com/jkvargas/russimp)
 
-There is a high chance that you are actually looking for russimp https://github.com/jkvargas/russimp
+Raw bindings for the C API of assimp.
 
-## How to use
+## Platform Support
+We build, test, and provide prebuilt packages for the following targets:
+- x86_64-pc-windows-msvc
+- x86_64-apple-darwin
+- x86_64-unknown-linux-gnu
 
-**By default**, you will need to have `assimp` installed on your system, if you are an ubuntu user I believe you will need to install `libassimp-dev`.
+Additional targets that work when building from source:
+- aarch64-apple-darwin (M1 Macs, cross-compiled on x86_64.)
+- aarch64-unknown-linux-gnu (Raspberry Pi 4b, built on the machine itself.)
 
-`russimp-sys` will look for `assimp` library and headers from your system, generates rust bindings and [dynamic linking](<https://en.wikipedia.org/wiki/Library_(computing)#Dynamic_linking>) to `assimp` shared library.
+Platforms that are not supported and won't build:
+- x86_64-pc-windows-gnu (See: [assimp/4686]([https://github.com/assimp/assimp/issues/4868))
 
-**For Windows**, This package uses [cargo-vcpkg](https://crates.io/crates/cargo-vcpkg) to manage system dependencies. Running ```cargo vcpkg build``` will build the necessary dependencies within the target directory. Alternatively provide a VCPKG_ROOT environment variable pointed at the location of a shared vcpkg installation.
+## Installation
 
-**For who want a standalone executable file**. Enable [`prebuilt`](#prebuilt) feature, then `russimp-sys` will download the prebuilt `assimp` [static library](<https://en.wikipedia.org/wiki/Library_(computing)#Static_libraries>) and its dependencies from github, linking libraries to your executable, but it will increase the size of the executable.
-
-## Features
-
-You can use the following [FEATURES](https://doc.rust-lang.org/cargo/reference/features.html#the-features-section) to configure the behavior of `russimp-sys`.
+**By default** `russimp-sys` is looking for the `assimp` library in the system.  
+However there are many ways for the crate to install the library for you by specifying these crate features:
 
 ### `prebuilt`
+This features will download a prebuilt package from this repo's release page, these packages are built and published automatically every time we release a new version. 
 
-Download prebuilt `Assimp` static library binaries from github and skip building from source.
+In addition, you can specify a local package by setting the `RUSSIMP_PACKAGE_DIR` environment variable to the path of the package.
+You can run the provided package binary to generate a package for your platform.
 
-Because `Assimp` build is slow and have build environment requirements. We provide prebuilt binaries for common platforms and features.
+```cargo run --bin package --features <INSERT-LINK-TYPE>```
 
-When a new version is released, github action automatically runs pre-build tasks, and all prebuilt binaries are saved in [github releases](https://github.com/jkvargas/russimp-sys/releases).
+### `build-assimp` or `static-link`
+The `build-assimp` feature will build the library from source and link it dynamically.  
+The `static-link` feature will build the library from source and link it statically.
 
-The `russimp-sys` build script will try to download the prebuilt binaries from github first, and skip the full source build.
+Building from source requires the following dependencies:
+- CMake
+- libclang (for `bindgen`)
+- A C/C++ compiler
+- RECOMMENDED: Ninja (For Windows users the buildscript automatically uses Ninja if it finds it in the PATH)
 
-### `static-link`
-
-Enabling `static-link` feature without `prebuilt` feature, will build `assimp` from source.
-
-Build from source need the following dependencies:
-
-* cmake
-* clang
-* Ninja for Linux and MacOS, Visual Studio 2019 for Windows
+### Additional Features:
 
 ### `nozlib`
 
-By default `russimp-sys` will statically link zlibstatic, you can disable this feature if it conflicts with other dependencies.
-
-### `nolibcxx`
-
-By default `russimp-sys` links to `libstdc++` in linux and `libc++` in macos, turning this on `russimp-sys` won't link to the c++ standard library.
+By default `russimp-sys` will statically link `zlibstatic`. Enabling this feature will link to the system's `zlib` library.
 
 ## Changelog
+### 2.0.0
+* Complete overhaul of the build process.
 
+* Expose all assimp headers.
+* Rework CI pipeline.
+* Support for local assimp packaging and local package usage. (See: `prebuilt` feature)
+* Remove vcpkg support.
+* Remove `nolibcxx` feature.
 ### 1.0.3
 * Builds based on 5.2.5 release
 ### 1.0.0
-
-- Builds based on 5.1.0 release

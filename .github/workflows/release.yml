@@ -1,109 +1,104 @@
-name: Build Release
+name: Release
+
 on:
   push:
     tags:
-      - v*
+      - 'v*'
+
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
-  create-release:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-          allowUpdates: true
-          omitBody: true
-          prerelease: true
-          draft: true
-          token: ${{ secrets.ACCESS_TOKEN }}
   build:
+    name: Build
     runs-on: ${{ matrix.target.os }}
-    needs: create-release
     strategy:
-      fail-fast: false
       matrix:
         target:
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             triple: x86_64-unknown-linux-gnu
-          - os: macos-11
+          - os: macos-latest
             triple: x86_64-apple-darwin
-          - os: macos-11
-            triple: aarch64-apple-darwin
-          - os: windows-2019
+          - os: windows-latest
             triple: x86_64-pc-windows-msvc
-        features: ['static-link', 'static-link,nozlib']
+        features: [ 'build-assimp', 'static-link' ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Install rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-      - name: Install dependencies (Linux)
+
+      # LLVM comes preinstalled on Windows and macOS runners.
+      - name: Install LLVM
         if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install ninja-build
-      - name: Install LLVM (Windows) # required for bindgen to work, see https://github.com/rust-lang/rust-bindgen/issues/1797
         uses: KyleMayes/install-llvm-action@v1
-        if: runner.os == 'Windows'
         with:
-          version: '11.0'
           directory: ${{ runner.temp }}/llvm
-      - name: Install dependencies (macOS)
-        if: runner.os == 'macOS'
+          cached: true
+          version: '14.0'
+
+      # CMake and Rust are preinstalled on all runners.
+
+      - name: Update Rust
         run: |
-          brew install ninja
-      - name: Install Rust target ${{ matrix.target.triple }}
-        run: |
-          rustup target add ${{ matrix.target.triple }}
-      - name: Build ${{ matrix.target.triple }}
+          rustup default stable
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build
+        run: cargo build --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
+
+      - name: Package Assimp
+        run: cargo run --bin package --target ${{ matrix.target.triple }} --bin package --features ${{ matrix.features }}
         env:
-          RUSSIMP_BUILD_CACHE_DIR: ${{ runner.temp }}/release
-          RUSSIMP_BUILD_OUT_DIR: ${{ runner.temp }}/out
-          RUSSIMP_PREBUILT: OFF
-        run: |
-          cargo build -vv --release --no-default-features --features ${{ matrix.features }} --target ${{ matrix.target.triple }}
-        shell: bash
-      - name: Upload release
-        uses: ncipollo/release-action@v1
+          RUSSIMP_PACKAGE_DIR: ./russimp-package
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          allowUpdates: true
-          artifacts: ${{ runner.temp }}/release/*
-          artifactContentType: application/gzip
-          artifactErrorsFailBuild: true
-          omitBodyDuringUpdate: true
-          omitNameDuringUpdate: true
-          prerelease: true
-          draft: true
-          token: ${{ secrets.ACCESS_TOKEN }}
-  publish-release:
-    runs-on: ubuntu-20.04
+          name: russimp-packages
+          path: ${{ env.RUSSIMP_PACKAGE_DIR }}/*
+        env:
+          RUSSIMP_PACKAGE_DIR: ./russimp-package
+
+  publish:
+    name: Publish Release
     needs: build
+    runs-on: ubuntu-latest
     steps:
-      - name: Publish Release
-        uses: ncipollo/release-action@v1
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          allowUpdates: true
-          omitBody: true
+          submodules: true
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: russimp-packages
+          path: ${{ runner.temp }}/russimp-package
+
+      - name: List artifacts
+        run: |
+          echo "Received artifacts:"
+          ls -l $RUSSIMP_PACKAGE_DIR
+        env:
+          RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp-package
+
+      - name: Publish release on GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          body: |
+            This release was automatically created by GitHub Actions.
+          files: |
+            ${{ env.RUSSIMP_PACKAGE_DIR }}/*
           token: ${{ secrets.ACCESS_TOKEN }}
-  cargo-publish:
-    needs: publish-release
-    env:
-      CRATESIO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install assimp
-        run: sudo bash ${GITHUB_WORKSPACE}/install_assimp.bash
-      - name: Install stable
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - name: cargo publish
-        continue-on-error: true
-        run: cargo publish --token ${CRATESIO_TOKEN}
+        env:
+          RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp-package
+
+      - name: Publish release on crates.io
+        run: cargo publish --features prebuilt --token $CRATES_IO_TOKEN
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATESIO_TOKEN }}
+          RUSSIMP_PACKAGE_DIR: ${{ runner.temp }}/russimp-package

@@ -1,64 +1,58 @@
 name: Test
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+        - '**'
+    tags:
+      - '!v*' # Exclude tags starting with 'v'
+    pull_request:
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  lin-build:
-    runs-on: ubuntu-latest
+  test:
+    name: Test
+    runs-on: ${{ matrix.target.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - os: ubuntu-latest
+            triple: x86_64-unknown-linux-gnu
+          - os: macos-latest
+            triple: x86_64-apple-darwin
+          - os: windows-latest
+            triple: x86_64-pc-windows-msvc
+        features: [ 'build-assimp', 'static-link' ]
     steps:
-      - uses: actions/checkout@v2
-      - name: Install assimp
-        run: sudo bash ${GITHUB_WORKSPACE}/install_assimp.bash
-      - name: Install stable
-        uses: actions-rs/toolchain@v1
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - name: Build
-        run: cargo build --verbose
-      - name: Run tests
-        run: cargo test --lib --verbose
+          submodules: true
 
-  win-build:
-    runs-on: windows-latest
-    steps:
-      - name: Set up Visual Studio shell
-        uses: egor-tensin/vs-shell@v2
-      - name: Set up LIBCLANG_PATH
-        run: echo "LIBCLANG_PATH=$env:VCINSTALLDIR\Tools\Llvm\x64\bin" >> $env:GITHUB_ENV
-      - uses: actions/checkout@v2
-      - name: Install stable
-        uses: actions-rs/toolchain@v1
+      # LLVM comes preinstalled on Windows and macOS runners
+      - name: Install LLVM
+        if: runner.os == 'Linux'
+        uses: KyleMayes/install-llvm-action@v1
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - name: install cargo-vcpkg
-        run: cargo install cargo-vcpkg
-      - name: vcpkg build
-        run: cargo vcpkg build
-      - name: Build
-        run: cargo build --verbose
-      - name: Run tests
-        run: cargo test --lib --verbose
+          directory: ${{ runner.temp }}/llvm
+          cached: true
+          version: '14.0'
 
-  macos-build:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install assimp
-        run: brew install assimp
-      - name: Install stable
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      # CMake and Rust are preinstalled on all runners.
+
+      - name: Update Rust
+        run: | 
+          rustup update stable
+          rustup target add ${{ matrix.target.triple }}
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+
       - name: Build
-        run: cargo build --verbose
-      - name: Run tests
-        run: cargo test --lib --verbose
+        run: cargo build --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
+
+      - name: Test
+        run: cargo test --target ${{ matrix.target.triple }} --features ${{ matrix.features }}
