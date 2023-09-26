@@ -25,6 +25,7 @@ path = "bin/package/main.rs"
 default = []
 build-assimp = []
 prebuilt = []
+nozlib = []
 static-link = ["build-assimp"]
 
 [dependencies]
