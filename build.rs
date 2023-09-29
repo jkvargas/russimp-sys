@@ -15,6 +15,10 @@ const fn build_zlib() -> bool {
     cfg!(not(feature = "nozlib"))
 }
 
+const fn build_assimp() -> bool {
+    cfg!(feature = "build-assimp")
+}
+
 // Compiler specific compiler flags for CMake
 fn compiler_flags() -> Vec<&'static str> {
     let mut flags = Vec::new();
@@ -40,7 +44,7 @@ fn lib_names() -> Vec<Library> {
         names.push(Library("assimp", static_lib()));
     }
 
-    if build_zlib() {
+    if build_assimp() && build_zlib() {
         names.push(Library("zlibstatic", "static"));
     } else {
         names.push(Library("z", "dylib"));
@@ -166,7 +170,7 @@ fn main() {
     #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
     println!("cargo:rustc-link-search=native=/opt/brew/lib/");
 
-    if cfg!(feature = "build-assimp") {
+    if build_assimp() {
         build_from_source();
     } else if cfg!(feature = "prebuilt") {
         link_from_package();
