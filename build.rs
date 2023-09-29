@@ -164,6 +164,18 @@ fn main() {
         link_from_package();
     }
 
+    // assimp/defs.h requires config.h to be present, which is generated at build time when building
+    // from the source code (which is disabled by default).
+    // In this case, place an empty config.h file in the include directory to avoid compilation errors.
+    let config_file = "assimp/include/assimp/config.h";
+    let config_exists = fs::metadata(config_file).is_ok();
+    if !config_exists {
+        fs::write(config_file, "").expect(
+            r#"Unable to write config.h to assimp/include/assimp/,
+            make sure you cloned submodules with "git submodule update --init --recursive""#,
+        );
+    }
+
     bindgen::builder()
         .header("wrapper.h")
         .clang_arg(format!("-I{}", out_dir.join(static_lib()).join("include").display()))
@@ -181,6 +193,11 @@ fn main() {
         .unwrap()
         .write_to_file(out_dir.join("bindings.rs"))
         .expect("Could not generate russimp bindings, for details see https://github.com/jkvargas/russimp-sys");
+
+    if !config_exists {
+        // Clean up config.h
+        let _ = fs::remove_file(config_file);
+    }
 
     let mut built_opts = built::Options::default();
     built_opts
