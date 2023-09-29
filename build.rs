@@ -158,6 +158,14 @@ fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
+    // Look for assimp lib in Brew install paths on MacOS.
+    // See https://stackoverflow.com/questions/70497361/homebrew-mac-m1-cant-find-installs
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    println!("cargo:rustc-link-search=native=/opt/homebrew/lib/");
+
+    #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+    println!("cargo:rustc-link-search=native=/opt/brew/lib/");
+
     if cfg!(feature = "build-assimp") {
         build_from_source();
     } else if cfg!(feature = "prebuilt") {
