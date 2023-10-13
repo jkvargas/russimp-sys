@@ -34,3 +34,14 @@ impl From<&aiString> for String {
         .into()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// A simple test to make sure assimp library linked properly.
+    #[test]
+    fn test_version() {
+        let _ = unsafe { aiGetVersionMajor() };
+    }
+}

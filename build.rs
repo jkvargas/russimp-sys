@@ -15,6 +15,10 @@ const fn build_zlib() -> bool {
     cfg!(not(feature = "nozlib"))
 }
 
+const fn build_assimp() -> bool {
+    cfg!(feature = "build-assimp")
+}
+
 // Compiler specific compiler flags for CMake
 fn compiler_flags() -> Vec<&'static str> {
     let mut flags = Vec::new();
@@ -40,7 +44,7 @@ fn lib_names() -> Vec<Library> {
         names.push(Library("assimp", static_lib()));
     }
 
-    if build_zlib() {
+    if build_assimp() && build_zlib() {
         names.push(Library("zlibstatic", "static"));
     } else {
         names.push(Library("z", "dylib"));
@@ -158,10 +162,30 @@ fn main() {
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
 
-    if cfg!(feature = "build-assimp") {
+    // Look for assimp lib in Brew install paths on MacOS.
+    // See https://stackoverflow.com/questions/70497361/homebrew-mac-m1-cant-find-installs
+    #[cfg(all(target_os = "macos", target_arch = "aarch64"))]
+    println!("cargo:rustc-link-search=native=/opt/homebrew/lib/");
+
+    #[cfg(all(target_os = "macos", target_arch = "x86_64"))]
+    println!("cargo:rustc-link-search=native=/opt/brew/lib/");
+
+    if build_assimp() {
         build_from_source();
     } else if cfg!(feature = "prebuilt") {
         link_from_package();
+    }
+
+    // assimp/defs.h requires config.h to be present, which is generated at build time when building
+    // from the source code (which is disabled by default).
+    // In this case, place an empty config.h file in the include directory to avoid compilation errors.
+    let config_file = "assimp/include/assimp/config.h";
+    let config_exists = fs::metadata(config_file).is_ok();
+    if !config_exists {
+        fs::write(config_file, "").expect(
+            r#"Unable to write config.h to assimp/include/assimp/,
+            make sure you cloned submodules with "git submodule update --init --recursive""#,
+        );
     }
 
     bindgen::builder()
@@ -181,6 +205,11 @@ fn main() {
         .unwrap()
         .write_to_file(out_dir.join("bindings.rs"))
         .expect("Could not generate russimp bindings, for details see https://github.com/jkvargas/russimp-sys");
+
+    if !config_exists {
+        // Clean up config.h
+        let _ = fs::remove_file(config_file);
+    }
 
     let mut built_opts = built::Options::default();
     built_opts

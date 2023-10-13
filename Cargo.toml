@@ -6,11 +6,27 @@ edition = "2021"
 license-file = "LICENSE"
 readme = "README.md"
 homepage = "https://github.com/jkvargas/russimp-sys"
-categories = ["rendering", "external-ffi-bindings", "game-engines", "multimedia"]
+categories = [
+    "rendering",
+    "external-ffi-bindings",
+    "game-engines",
+    "multimedia",
+]
 keywords = ["assimp", "3d", "blend", "3ds", "glTF"]
 repository = "https://github.com/jkvargas/russimp-sys"
 description = "Raw Assimp bindings for Rust"
-exclude = ["/assimp", "*.bash", "*.ps1"]
+include = [
+    "/assimp/include/assimp/**/*.{h,inl}",
+    "/src/",
+    "/bin/",
+    "/build.rs",
+    "/wrapper.h",
+    "/Cargo.toml",
+    "/LICENSE",
+    "/README.md",
+    "!*.bash",
+    "!*.ps1",
+]
 
 [lib]
 name = "russimp_sys"
@@ -37,6 +53,6 @@ bindgen = "0.63.0"
 built = "0.5.2"
 cmake = "0.1.49"
 flate2 = "1.0.25"
-reqwest =  { version = "0.11.13", features = ["blocking", "rustls-tls"] }
+reqwest = { version = "0.11.13", features = ["blocking", "rustls-tls"] }
 tar = "0.4.38"
 which = "4.3.0"
