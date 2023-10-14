@@ -7,6 +7,8 @@ on:
     tags:
       - '!v*' # Exclude tags starting with 'v'
     pull_request:
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly (every Sunday night at midnight UTC)
 
 env:
   CARGO_TERM_COLOR: always
