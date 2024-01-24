@@ -1,6 +1,6 @@
 [package]
 name = "russimp-sys"
-version = "2.0.2"
+version = "2.0.1"
 authors = ["Jhonny Knaak de Vargas"]
 edition = "2021"
 license-file = "LICENSE"
@@ -49,10 +49,10 @@ flate2 = "1.0.25"
 tar = "0.4.38"
 
 [build-dependencies]
-bindgen = "0.69.2"
-built = "0.7.1"
+bindgen = "0.63.0"
+built = "0.5.2"
 cmake = "0.1.49"
 flate2 = "1.0.25"
 reqwest = { version = "0.11.13", features = ["blocking", "rustls-tls"] }
 tar = "0.4.38"
-which = "5.0.0"
+which = "4.3.0"
