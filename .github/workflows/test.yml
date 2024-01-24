@@ -6,7 +6,9 @@ on:
         - '**'
     tags:
       - '!v*' # Exclude tags starting with 'v'
-    pull_request:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: '0 0 * * 0'  # Run weekly (every Sunday night at midnight UTC)
 
