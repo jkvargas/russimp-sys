@@ -47,7 +47,11 @@ fn lib_names() -> Vec<Library> {
     if build_assimp() && build_zlib() {
         names.push(Library("zlibstatic", "static"));
     } else {
-        names.push(Library("zlibstatic", "dylib"));
+        if cfg!(target_os = "windows") {
+            names.push(Library("zlibstatic", "dylib"));
+        } else {
+            names.push(Library("z", "dylib"));
+        }
     }
 
     if cfg!(target_os = "linux") {
