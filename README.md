@@ -48,6 +48,9 @@ Building from source requires the following dependencies:
 By default `russimp-sys` will statically link `zlibstatic`. Enabling this feature will link to the system's `zlib` library.
 
 ## Changelog
+### 2.0.2
+* Window build fix
+
 ### 2.0.0
 * Complete overhaul of the build process.
 
