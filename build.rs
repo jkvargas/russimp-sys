@@ -38,11 +38,7 @@ fn compiler_flags() -> Vec<&'static str> {
 fn lib_names() -> Vec<Library> {
     let mut names = Vec::new();
 
-    if cfg!(target_os = "windows") && cfg!(target_env = "gnu") {
-        panic!("Windows GNU is not supported, assimp fails to build for some reason.\nSee https://github.com/assimp/assimp/issues/4868");
-    } else {
-        names.push(Library("assimp", static_lib()));
-    }
+    names.push(Library("assimp", static_lib()));
 
     if build_assimp() && build_zlib() {
         names.push(Library("zlibstatic", "static"));
