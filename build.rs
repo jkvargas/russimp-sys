@@ -88,6 +88,9 @@ fn build_from_source() {
         .define("ASSIMP_BUILD_ASSIMP_TOOLS", "OFF")
         .define("ASSIMP_BUILD_TESTS", "OFF")
         .define("ASSIMP_BUILD_ZLIB", build_zlib)
+        // Disable being overly strict with warnings, which can cause build issues
+        // such as: https://github.com/assimp/assimp/issues/5315
+        .define("ASSIMP_WARNINGS_AS_ERRORS", "OFF")
         .define("LIBRARY_SUFFIX", "");
 
     // Add compiler flags
