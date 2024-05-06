@@ -25,7 +25,7 @@ jobs:
         target:
           - os: ubuntu-latest
             triple: x86_64-unknown-linux-gnu
-          - os: macos-latest
+          - os: macos-13 # latest will use arm
             triple: x86_64-apple-darwin
           - os: windows-latest
             triple: x86_64-pc-windows-msvc
@@ -72,7 +72,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install libassimp-dev
           elif [ "$RUNNER_OS" == 'macOS' ]; then
-              arch -x86_64 brew install assimp
+              brew install assimp
           elif [ "$RUNNER_OS" == 'Windows' ]; then
               vcpkg install assimp
           else
