@@ -72,7 +72,7 @@ jobs:
             sudo apt-get update
             sudo apt-get install libassimp-dev
           elif [ "$RUNNER_OS" == 'macOS' ]; then
-              brew install assimp
+              arch -x86_64 brew install assimp
           elif [ "$RUNNER_OS" == 'Windows' ]; then
               vcpkg install assimp
           else
