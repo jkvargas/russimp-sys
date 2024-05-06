@@ -14,9 +14,7 @@ We build, test, and provide prebuilt packages for the following targets:
 Additional targets that work when building from source:
 - aarch64-apple-darwin (M1 Macs, cross-compiled on x86_64.)
 - aarch64-unknown-linux-gnu (Raspberry Pi 4b, built on the machine itself.)
-
-Platforms that are not supported and won't build:
-- x86_64-pc-windows-gnu (See: [assimp/4686]([https://github.com/assimp/assimp/issues/4868))
+- x86_64-pc-windows-gnu
 
 ## Installation
 
