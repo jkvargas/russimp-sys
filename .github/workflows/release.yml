@@ -24,7 +24,7 @@ jobs:
         features: [ 'build-assimp', 'static-link' ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
 
@@ -55,7 +55,7 @@ jobs:
           RUSSIMP_PACKAGE_DIR: ./russimp-package
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: russimp-packages
           path: ${{ env.RUSSIMP_PACKAGE_DIR }}/*
@@ -68,12 +68,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           submodules: true
 
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: russimp-packages
           path: ${{ runner.temp }}/russimp-package
